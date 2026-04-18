@@ -44,9 +44,12 @@ graph TD
     RPC --> |"Executes on Ledger"| SC
 
     SC -.-> |"Employer"| Init["init_escrow()"]
-    SC -.-> |"Candidate"| Unlock["unlock_milestone()"]
+    SC -.-> |"Employer"| Unlock["unlock_milestone()"]
+    SC -.-> |"Candidate"| Read["Candidate Views Dashboard"]
     SC -.-> |"Employer"| Clawback["clawback()"]
 ```
+
+> **Note on Programmatic Trust (V1 vs V2):** For the purpose of this bootcamp MVP (V1), Stella acts as a generalized unlockable vault where the employer specifies the raw XLM amount to release dynamically. V2 will feature zero-knowledge on-chain milestone hashing for pre-determined arrays of deliverables.
 
 ### Directory Structure
 
@@ -54,12 +57,12 @@ graph TD
 stella/
 ├── contract/          Soroban smart contract (Rust)
 │   └── src/
-│       ├── lib.rs     Core escrow logic
+│       ├── lib.rs     Core escrow logic (Single-Job Overwrite Fixed)
 │       ├── test.rs    Unit tests (3+ passing)
 │       ├── types.rs   Data structures
 │       └── events.rs  On-chain event definitions
 │
-├── frontend/          React + Vite dApp
+├── frontend/          React + Vite dApp (PWA Ready)
 │   └── src/
 │       ├── pages/     Dashboard, Employer, Candidate
 │       ├── components/ Layout, WalletButton, EscrowCard, Toast
@@ -79,12 +82,12 @@ stella/
 
 | Function           | Description                           |
 | ------------------ | ------------------------------------- |
-| `init_escrow`      | Lock onboarding funds for a candidate |
-| `unlock_milestone` | Candidate claims completed milestone  |
+| `init_escrow`      | Lock onboarding funds (with duration) |
+| `unlock_milestone` | Employer releases partial amount      |
 | `clawback`         | Employer recovers remaining funds     |
 | `get_escrow`       | View escrow details for a candidate   |
 
-**Contract ID:** `CDA67YOAWOOMMSIW44IOQWDSB2P6PGG3PRH3WPFEFCM5BO3LGF7POHZL`
+**Contract ID:** `CCYWJ3RXON6AUJT32ME522B3W5D5PMPG4CUEBJEI6UA3AKRF4SOXP5MU`
 **Network:** Stellar Testnet
 
 ## Getting Started
