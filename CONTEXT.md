@@ -1,9 +1,11 @@
-# 🚀 Stellar Bootcamp 2026 — Context & Battle Plan
+# 🚀 Stella — Context & Battle Plan
 
-> **Last Updated:** 2026-04-18 09:01 PHT  
-> **Status:** 🟢 Fully Ready — Waiting for Bootcamp (4 PM)  
+> **Last Updated:** 2026-04-18 11:36 PHT  
+> **Status:** 🟢 PRD v1.2.0 Locked — Ready to Build  
+> **Product:** Stella — Soroban-powered pre-employment onboarding escrow  
 > **Event:** Stellar Bootcamp (Offline) — Whitecloak Office, Ortigas, Manila  
-> **Date:** April 18, 2026 | Duration: 4 hours (4:00 PM - 8:00 PM)
+> **Date:** April 18, 2026 | Duration: 4 hours (4:00 PM - 8:00 PM)  
+> **Track:** Prize Pool ($100–$200) — Full-stack dApp (contract + frontend + Freighter)
 
 ---
 
@@ -328,14 +330,20 @@ git push -u origin main
 c:\Users\delat\OneDrive\Desktop\stella\
 ├── .git/                    # Git repo (initialized ✅)
 ├── .gitignore               # Configured ✅
-├── bootcamp-ref/            # Cloned bootcamp guide (reference only, git-ignored)
+├── .env                     # Live secrets (Stellar, Freighter) ✅
+├── .env.example             # Template ✅
 ├── CONTEXT.md               # ← YOU ARE HERE (this file)
-├── contract/                # 🔲 Will be created when you receive your assignment
+├── PRD.md                   # Product Requirements Document (v1.2.0) ✅
+├── BUILD.md                 # Build guide & smart contract best practices ✅
+├── bootcamp-ref/            # Cloned bootcamp guide (reference only, git-ignored)
+├── contract/                # 🔲 Soroban smart contract (Stella escrow)
 │   ├── Cargo.toml
 │   └── src/
-│       ├── lib.rs           # Smart contract code
-│       └── test.rs          # Unit tests
-└── frontend/                # 🔲 Will be created if going for prize pool
+│       ├── lib.rs           # init_escrow, unlock_milestone, clawback, get_escrow
+│       ├── types.rs         # DataKey, Escrow struct, StellaError enum
+│       ├── events.rs        # Event emission helpers
+│       └── test.rs          # 3+ unit tests
+└── frontend/                # 🔲 React + Vite + TypeScript (prize pool track)
     └── ...
 ```
 
@@ -379,8 +387,18 @@ c:\Users\delat\OneDrive\Desktop\stella\
 | — | Freighter wallet set up | ✅ |
 | 09:01 | Freighter v5.39.0 on Testnet, address saved | ✅ |
 | 09:01 | `.env` updated with Freighter public key | ✅ |
-| — | Contract assigned (at bootcamp) | 🔲 Waiting for session |
-| — | Contract completed | 🔲 |
+| 10:30 | Gemini ideation handoff doc created | ✅ |
+| 10:30 | Ideation: Stellaroid Earn → pivoted to onboarding escrow | ✅ |
+| 11:00 | PRD.md v1.1.0 finalized — product renamed to **Stella** | ✅ |
+| 11:01 | CONTEXT.md aligned with PRD, all names consistent | ✅ |
+| 11:25 | BUILD.md reviewed — all names aligned to Stella | ✅ |
+| 11:36 | PRD v1.2.0: simplified Escrow, added InvalidAmount, pitch reframe | ✅ |
+| 11:36 | Cleanup: deleted ORGANIZER.md + gemini_ideation_handoff.md | ✅ |
+| — | Contract built (`contract/`) | 🔲 |
 | — | Tests passing (3+) | 🔲 |
-| — | Contract deployed | 🔲 |
+| — | Contract deployed to testnet | 🔲 |
+| — | Frontend built (`frontend/`) | 🔲 |
+| — | Freighter integration working | 🔲 |
+| — | Full demo flow verified | 🔲 |
+| — | Deployed to Vercel | 🔲 |
 | — | Submitted on Rise In | 🔲 |
