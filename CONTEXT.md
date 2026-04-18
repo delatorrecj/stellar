@@ -119,7 +119,7 @@ impl MyContract {
 | **WASM target** | ✅ Added | `wasm32-unknown-unknown` target ready |
 | **Stellar CLI** | ✅ v26.0.0 | Installed via winget (pre-built binary) |
 | **Testnet Identity** | ✅ `my-key` | Public: `GABTUX53227CZQJSRKS6UMT2VWUZCLX27AGCDLHRS7VYJJB4DBIMHKIU` |
-| **Funded Testnet Account** | ⏳ Pending | Fund via Friendbot (can do at bootcamp) |
+| **Funded Testnet Account** | ✅ Funded | 10,000 test XLM via Friendbot |
 | **Freighter Wallet** | ❓ Check browser | Install from https://www.freighter.app/ |
 
 ### 🔧 Setup Instructions (Run These in Order)
@@ -372,11 +372,11 @@ c:\Users\delat\OneDrive\Desktop\stella\
 | 08:35 | WASM target added (wasm32-unknown-unknown) | ✅ |
 | 08:47 | Stellar CLI v26.0.0 installed (winget pre-built) | ✅ |
 | 08:49 | Testnet identity `my-key` generated | ✅ |
-| 08:49 | Testnet funding attempted (Friendbot flaky) | ⏳ Retry later |
+| 08:49 | Testnet funding attempted (Friendbot flaky) | ✅ Funded! |
 | 08:50 | `.gitignore` hardened (secrets protection) | ✅ |
 | 08:50 | CONTEXT.md updated with full progress | ✅ |
-| — | Freighter wallet set up | ⏳ Check browser |
-| — | Testnet account funded | ⏳ Use Friendbot link |
+| 08:52 | Testnet account funded (10,000 test XLM) | ✅ |
+| — | Freighter wallet set up | ⏳ Install in Chrome |
 | — | Contract assigned (at bootcamp) | 🔲 Waiting for session |
 | — | Contract completed | 🔲 |
 | — | Tests passing (3+) | 🔲 |
