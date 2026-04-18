@@ -230,7 +230,76 @@ export const Dashboard: React.FC = () => {
 
       {/* 
         ========================================
-        4. CTA / ONBOARDING INTEGRATION
+        4. BOOTCAMP PITCH (ORGANIZER REQUIREMENTS)
+        ========================================
+      */}
+      <section className="px-6 py-24 bg-white border-b border-neutral-100">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-12">
+            <h2 className="font-display text-3xl font-extrabold text-neutral-900 mb-4 flex items-center gap-2">
+              <Star className="w-6 h-6 text-accent-500" />
+              Project Stella: The Pitch
+            </h2>
+            <p className="text-neutral-500 font-medium">
+              Stellar UniTour Bootcamp Submission Details
+            </p>
+          </div>
+
+          <div className="space-y-8">
+            <div className="bg-neutral-50 rounded-2xl p-6 border border-neutral-100 shadow-sm">
+              <h3 className="text-xs font-bold tracking-widest text-primary-600 uppercase mb-2">Problem (1 Sentence)</h3>
+              <p className="text-neutral-700 leading-relaxed text-sm lg:text-base">
+                Fresh graduates in the Philippines looking for BPO jobs accept job offers and then ghost before Day 1 because they lack the ₱3,000–₱5,000 needed for mandatory pre-employment requirements (medical exams, NBI clearance), costing employers thousands in wasted recruitment time and empty seats.
+              </p>
+            </div>
+
+            <div className="bg-neutral-50 rounded-2xl p-6 border border-neutral-100 shadow-sm">
+              <h3 className="text-xs font-bold tracking-widest text-primary-600 uppercase mb-2">Solution (1 Sentence)</h3>
+              <p className="text-neutral-700 leading-relaxed text-sm lg:text-base">
+                Stella bridges this gap with a programmable escrow where employers lock onboarding funds into a Soroban smart contract, releasing partial payouts precisely as the candidate completes each verified milestone, ensuring zero-trust liquidity for graduates while protecting the employer's capital from advance-theft.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-neutral-50 rounded-2xl p-6 border border-neutral-100 shadow-sm">
+                <h3 className="text-xs font-bold tracking-widest text-primary-600 uppercase mb-2">Core Feature (MVP)</h3>
+                <p className="text-neutral-700 leading-relaxed text-sm">
+                  An employer initiates an escrow locking 500 XLM into the Soroban contract. The candidate triggers <code>unlock_milestone</code> to securely receive exactly 100 XLM for their first requirement, instantly transferring the requested liquidity directly to their wallet.
+                </p>
+              </div>
+              <div className="bg-neutral-50 rounded-2xl p-6 border border-neutral-100 shadow-sm">
+                <h3 className="text-xs font-bold tracking-widest text-primary-600 uppercase mb-2">Why This Wins</h3>
+                <p className="text-neutral-700 leading-relaxed text-sm">
+                  It directly targets a massive, hyper-local friction point in the Philippine job market (BPO recruitment costs and Day Zero poverty). The solution forces real money movement through conditionally programmable trust, perfectly exemplifying Soroban’s superiority over unsecured cash advances.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-100">
+                <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase mb-1">Region</div>
+                <div className="font-semibold text-neutral-800 text-sm">SEA (Philippines)</div>
+              </div>
+              <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-100">
+                <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase mb-1">Theme</div>
+                <div className="font-semibold text-neutral-800 text-sm">Escrow for Contracts</div>
+              </div>
+              <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-100">
+                <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase mb-1">Target Users</div>
+                <div className="font-semibold text-neutral-800 text-sm">SMEs / Underbanked</div>
+              </div>
+              <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-100">
+                <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase mb-1">Features</div>
+                <div className="font-semibold text-neutral-800 text-sm">Soroban & XLM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 
+        ========================================
+        5. CTA / ONBOARDING INTEGRATION
         ========================================
       */}
       <section ref={ctaRef} className="px-6 py-24 bg-primary-50 relative overflow-hidden">
