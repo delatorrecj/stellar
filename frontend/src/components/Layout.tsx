@@ -44,9 +44,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <span className="text-xl font-bold tracking-tight text-neutral-900">Stella</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link to="/onboarding" className="text-sm font-semibold text-neutral-600 hover:text-primary-600 transition-colors">
-              Sign In
-            </Link>
+            <a href="#cta-section" onClick={(e) => { e.preventDefault(); document.getElementById('cta-section')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-sm font-semibold text-neutral-600 hover:text-primary-600 transition-colors">
+              Sign Up
+            </a>
           </div>
         </header>
         <main>

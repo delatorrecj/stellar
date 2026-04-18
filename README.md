@@ -112,6 +112,15 @@ cargo test
 stellar contract build
 ```
 
+## Testing & Simulation
+
+To test the complete end-to-end flow locally, you can simulate both the Employer and Candidate using a single Freighter extension:
+
+1. **Create Two Accounts**: Open Freighter, click the gear icon (Settings) -> Accounts -> **"Create new wallet"**. This generates a second account from your seed phrase. Rename them to **"Employer"** and **"Candidate"**.
+2. **Fund via Friendbot**: Ensure your network is set to **Testnet**. Select your "Employer" account and click "Fund with Friendbot" (or "Get test network lumens") to receive 10,000 test XLM. Do the same for the "Candidate" account.
+3. **Simulate the Employer**: With the "Employer" account active in Freighter, connect to the dApp and click "I'm hiring someone". Initiate an escrow by pasting the public key of your "Candidate" account.
+4. **Simulate the Candidate**: Once the escrow is funded and locked, switch your Freighter active account to "Candidate". Return to the dApp landing page, switch your role to Candidate, and you will securely see the funds waiting for you to claim!
+
 ## Tech Stack
 
 | Layer    | Technology                               |

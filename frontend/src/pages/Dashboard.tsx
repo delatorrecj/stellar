@@ -53,7 +53,7 @@ export const Dashboard: React.FC = () => {
           </h1>
           
           <p className="text-lg lg:text-xl text-neutral-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            A programmable pre-employment escrow protecting employers from candidate drop-off, while giving graduates the liquidity they need for Day 1.
+            A programmable pre-employment escrow protecting employers from candidate drop-off, while giving graduates the liquidity they need.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -319,7 +319,7 @@ export const Dashboard: React.FC = () => {
         5. CTA / ONBOARDING INTEGRATION
         ========================================
       */}
-      <section ref={ctaRef} className="px-6 py-24 bg-primary-50 relative overflow-hidden">
+      <section ref={ctaRef} id="cta-section" className="px-6 py-24 bg-primary-50 relative overflow-hidden">
         {/* Subtle pattern background - using dots directly in css */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#1e1e1e 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
         
