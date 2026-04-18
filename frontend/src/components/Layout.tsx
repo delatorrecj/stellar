@@ -36,8 +36,30 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsMobileMenuOpen(false);
   };
 
-  // ── Pre-onboarding: Minimal chrome ──
-  if (isPreOnboarding) {
+  // ── Pre-onboarding: Landing Page (Full bleed) ──
+  if (location.pathname === '/') {
+    return (
+      <div className="antialiased text-neutral-600 bg-neutral-50 min-h-screen">
+        <header className="absolute top-0 left-0 right-0 z-50 h-20 flex items-center justify-between px-6 lg:px-12">
+          <Link to="/" className="flex items-center gap-2 no-underline">
+            <Star className="w-6 h-6 text-accent-500 fill-accent-500" />
+            <span className="text-xl font-bold tracking-tight text-neutral-900">Stella</span>
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/onboarding" className="text-sm font-semibold text-neutral-600 hover:text-primary-600 transition-colors">
+              Sign In
+            </Link>
+          </div>
+        </header>
+        <main>
+          {children}
+        </main>
+      </div>
+    );
+  }
+
+  // ── Pre-onboarding: Onboarding Flow (Minimal chrome) ──
+  if (location.pathname === '/onboarding') {
     return (
       <div className="min-h-screen bg-neutral-50 antialiased text-neutral-600">
         <header className="h-16 flex items-center justify-center px-5">
