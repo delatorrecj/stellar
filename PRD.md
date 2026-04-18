@@ -1,5 +1,5 @@
 # STELLA — PRODUCT REQUIREMENTS DOCUMENT
-> **Version:** 1.2.0 | **Status:** ACTIVE
+> **Version:** 1.4.0 | **Status:** ACTIVE
 > **Last Updated:** 2026-04-18
 > **Owner:** Jerico | **Event:** Stellar Philippines UniTour Bootcamp 2026
 > **IDE Directive:** This document is a living spec. Update version, status, and changelog on every meaningful change. Do not delete deprecated sections — mark them `[DEPRECATED vX.X.X]` and move to the Graveyard at the bottom.
@@ -287,13 +287,16 @@ pub enum StellaError {
 ### Stack
 ```
 Framework:   React 18 + Vite 5 + TypeScript 5
-Styling:     Tailwind CSS
+Styling:     Tailwind CSS + BRAND.md design tokens (Warm Fintech Trust)
 Wallet:      @stellar/freighter-api
 Stellar SDK: @stellar/stellar-sdk
 State:       React useState / useReducer (no Redux for MVP)
 Routing:     React Router v6
 Env:         Vite env vars (VITE_ prefix)
+Font:        Plus Jakarta Sans (display/body) + JetBrains Mono (addresses)
 ```
+
+> **IDE Instruction:** All colors, fonts, spacing, and component patterns are defined in `BRAND.md`. Do not use ad-hoc values. Reference `BRAND.md` Section 3 (Color System) and Section 4 (Typography) as the single source of truth for CSS custom properties.
 
 ### Views
 
@@ -388,6 +391,7 @@ stella/
 ├── .gitignore                    # Hardened (see Security section)
 ├── PRD.md                        # This file — living spec
 ├── CONTEXT.md                    # Session tracker (updated each session)
+├── BRAND.md                      # Brand guidelines, design tokens, voice & copy
 ├── CHANGELOG.md                  # Human-readable change log
 │
 ├── contract/                     # Soroban smart contract
@@ -1028,6 +1032,19 @@ vercel --prod
 ## 17. CHANGELOG
 
 ```
+v1.4.0 — 2026-04-18
+  Created BRAND.md — user-centric brand guidelines
+  Rejected glassmorphism: users (Kevin/Maria) need warm fintech trust, not crypto aesthetics
+  Defined: color system (teal + amber), Plus Jakarta Sans, spacing tokens, motion rules
+  Updated PRD frontend stack to reference BRAND.md design tokens
+  Updated CONTEXT.md with deployment + brand milestones
+  Author: Jerico
+
+v1.3.0 — 2026-04-18
+  Smart contract built, optimized, and successfully deployed to Stellar testnet
+  Added Makefile and contract deployment steps to CONTEXT.md
+  Author: Jerico
+
 v1.2.0 — 2026-04-18
   Simplified Escrow struct: removed milestone_count, milestones_completed (unused in MVP)
   Added initialize() function for token address + admin setup

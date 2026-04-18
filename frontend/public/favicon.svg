@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="stella-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0D9494"/>
+      <stop offset="100%" stop-color="#0B6161"/>
+    </linearGradient>
+    <linearGradient id="stella-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD166"/>
+      <stop offset="100%" stop-color="#E8A317"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <rect width="512" height="512" rx="112" fill="url(#stella-grad)"/>
+  <!-- Main 5-pointed star -->
+  <path d="M256 96 l48 148 h156 l-126 92 48 148 -126-92 -126 92 48-148 -126-92 h156z" fill="white" opacity="0.95"/>
+  <!-- Inner accent star (smaller, amber) -->
+  <path d="M256 176 l24 74 h78 l-63 46 24 74 -63-46 -63 46 24-74 -63-46 h78z" fill="url(#stella-accent)" opacity="0.9"/>
+</svg>

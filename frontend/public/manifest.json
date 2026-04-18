@@ -1,0 +1,22 @@
+{
+  "name": "Stella — Secure Your Onboarding",
+  "short_name": "Stella",
+  "description": "Pre-employment escrow on the Stellar network. Protecting workers and employers through transparent, on-chain fund management.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF8",
+  "theme_color": "#0D9494",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-32.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    }
+  ]
+}

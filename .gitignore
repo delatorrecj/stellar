@@ -5,6 +5,8 @@
 # Stellar identity / secret keys
 *.toml
 !Cargo.toml
+!rustfmt.toml
+!clippy.toml
 identity/
 *secret*
 *seed*
@@ -23,8 +25,9 @@ identity/
 # ═══════════════════════════════════════════════
 /target/
 **/target/
-Cargo.lock
+# Cargo.lock is committed for reproducible contract builds
 *.wasm
+contract/test_snapshots/
 
 # ═══════════════════════════════════════════════
 # Node / Frontend
