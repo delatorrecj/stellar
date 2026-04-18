@@ -104,14 +104,15 @@ Real money movement. Programmable trust. No intermediary.
 ## 4. PRODUCT SCOPE
 
 ### MVP — Hackathon Build (Today)
-- [ ] Soroban smart contract with 3 core functions
-- [ ] React + Vite + TypeScript frontend
-- [ ] Freighter wallet integration (employer + candidate)
-- [ ] Employer creates escrow (locks XLM)
-- [ ] Candidate views pending escrow
-- [ ] Candidate claims milestone payout
-- [ ] Transaction hash displayed on success
-- [ ] 3+ passing unit tests
+- [x] Soroban smart contract with 3 core functions
+- [x] React + Vite + TypeScript frontend
+- [x] Progressive Web App (PWA) with offline capabilities
+- [x] Freighter wallet integration (employer + candidate)
+- [x] Employer creates escrow (locks XLM)
+- [x] Candidate views pending escrow
+- [x] Candidate claims milestone payout
+- [x] Transaction hash displayed on success
+- [x] 3+ passing unit tests
 
 ### V1 — Post-Hackathon (Weeks 1–4)
 - [ ] Employer-approved milestone unlock (currently candidate self-claims)

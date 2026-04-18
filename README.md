@@ -97,7 +97,8 @@ stellar contract build
 | Layer     | Technology                               |
 |-----------|------------------------------------------|
 | Contract  | Rust, Soroban SDK, soroban-sdk v22       |
-| Frontend  | React 19, Vite 6, Tailwind CSS v4       |
+| Frontend  | React 19, Vite 6, Tailwind CSS v4        |
+| PWA       | vite-plugin-pwa, Service Workers         |
 | Wallet    | Freighter API v6                         |
 | Network   | Stellar Testnet, Soroban RPC             |
 | Design    | "Warm Fintech Trust" (Plus Jakarta Sans) |
