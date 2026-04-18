@@ -1,6 +1,21 @@
 # Stella ⭐
 
-> Pre-employment escrow on the Stellar network. Protecting workers and employers through transparent, on-chain fund management.
+<div align="center">
+  <img src="frontend/public/S.svg" alt="Stella Logo" width="120"/>
+  <h1>Stella — Secure Your Onboarding</h1>
+  
+  <p><strong>A milestone-based escrow dApp built on Soroban to end the Day Zero poverty trap for fresh graduates.</strong></p>
+
+  <p>
+    <a href="https://stella-escrow.vercel.app/"><img src="frontend/public/qr-stella.svg" alt="QR App" width="120" /></a>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://github.com/delatorrecj/stellar"><img src="frontend/public/qr-github.svg" alt="QR GitHub" width="120" /></a>
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/Soroban-SDK%20v22-blue" alt="Soroban Badge" />
+  </p>
+</div>
 
 ## What is Stella?
 

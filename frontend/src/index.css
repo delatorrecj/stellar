@@ -158,32 +158,6 @@
     font-optical-sizing: auto;
     font-variation-settings: "slnt" 0, "wdth" 100, "GRAD" 0, "ROND" 0;
   }
-
-  /* ── Structural & Effects ── */
-  .glass-panel {
-    @apply bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(30,30,30,0.06)];
-  }
-  
-  .glass-panel-dark {
-    @apply bg-neutral-900/60 backdrop-blur-xl border border-neutral-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)];
-  }
-
-  .glow-border {
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 20px rgba(0,0,0,0.4);
-  }
-
-  .animate-float {
-    animation: float 8s ease-in-out infinite;
-  }
-  
-  .animate-float-delayed {
-    animation: float 8s ease-in-out 4s infinite;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-30px); }
-  }
 }
 
 /* ── Reduced motion ── */
