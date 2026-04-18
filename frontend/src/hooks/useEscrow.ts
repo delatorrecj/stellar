@@ -66,14 +66,14 @@ export const useEscrow = () => {
     }
   };
 
-  const createEscrow = useCallback(async (candidate: string, amount: string, _title?: string) => {
+  const createEscrow = useCallback(async (candidate: string, amount: string, deadlineDays: number = 30) => {
     if (!address) throw new Error('Wallet not connected');
     setLoading(true);
     setError(null);
     setLastTxHash(undefined);
 
     try {
-      const tx = await StellaClient.createEscrowTx(address, candidate, amount, 30);
+      const tx = await StellaClient.createEscrowTx(address, candidate, amount, deadlineDays);
       const hash = await submitTx(tx.toXDR());
       return hash;
     } catch (err: any) {

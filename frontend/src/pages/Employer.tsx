@@ -17,6 +17,7 @@ export const Employer: React.FC = () => {
 
   const [candidate, setCandidate] = useState('');
   const [amount, setAmount] = useState('');
+  const [durationDays, setDurationDays] = useState('30');
   const [searchTarget, setSearchTarget] = useState('');
   const [releaseAmount, setReleaseAmount] = useState('');
   const [activeEscrow, setActiveEscrow] = useState<any>(null);
@@ -37,9 +38,10 @@ export const Employer: React.FC = () => {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createEscrow(candidate, amount);
+      await createEscrow(candidate, amount, Number(durationDays));
       setCandidate('');
       setAmount('');
+      setDurationDays('30');
       handleSearch();
     } catch (err) {
       console.error(err);
@@ -109,17 +111,31 @@ export const Employer: React.FC = () => {
                 required
               />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="label-section">Amount (XLM)</label>
-              <input
-                type="number"
-                step="0.0000001"
-                placeholder="0.00"
-                className="input-field"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-              />
+            <div className="flex gap-4">
+              <div className="flex flex-col gap-1.5 flex-1">
+                <label className="label-section">Amount (XLM)</label>
+                <input
+                  type="number"
+                  step="0.0000001"
+                  placeholder="0.00"
+                  className="input-field"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1.5 flex-1">
+                <label className="label-section">Duration (Days)</label>
+                <input
+                  type="number"
+                  min="1"
+                  placeholder="30"
+                  className="input-field"
+                  value={durationDays}
+                  onChange={(e) => setDurationDays(e.target.value)}
+                  required
+                />
+              </div>
             </div>
             <button type="submit" disabled={loading} className="btn-primary mt-2">
               {loading ? 'Processing...' : 'Lock Onboarding Funds'}

@@ -74,12 +74,11 @@ impl StellaContract {
             return Err(StellaError::InvalidDeadline);
         }
 
-        // STEP 3: Check preconditions — no duplicate escrow
+        // STEP 3: Check for existing active escrow
         let key = DataKey::Escrow(candidate.clone());
-        if env.storage().persistent().has(&key) {
-            // Check if previous escrow is still active
-            let existing: Escrow = env.storage().persistent().get(&key).unwrap();
-            if existing.is_active {
+        if let Some(existing_escrow) = env.storage().persistent().get::<_, Escrow>(&key) {
+            // FIX: Allow overwriting if the previous escrow is finished or clawed back
+            if existing_escrow.is_active {
                 return Err(StellaError::EscrowAlreadyExists);
             }
         }
