@@ -1,61 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
 
-/* ── BRAND: Warm Fintech Trust (Stella) ── */
+/* ── BRAND: Stella — Trust Blue + Gold ── */
 /* Reference: BRAND.md — All tokens from Sections 3-8 */
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* ── Typography ── */
+  --font-display: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 
-  /* ── Primary: Deep Teal (§3) ── */
-  --color-primary-50:  #EEFBFB;
-  --color-primary-100: #D5F5F5;
-  --color-primary-200: #A8EBEB;
-  --color-primary-300: #6DD8D8;
-  --color-primary-400: #38BFBF;
-  --color-primary-500: #0D9494;
-  --color-primary-600: #0D7A7A;
-  --color-primary-700: #0B6161;
-  --color-primary-800: #094D4D;
-  --color-primary-900: #073A3A;
+  /* ── Primary: Trust Blue ── */
+  --color-primary-50:  #EBF3FF;
+  --color-primary-100: #D6E7FF;
+  --color-primary-200: #ADC9FF;
+  --color-primary-300: #7AA6FF;
+  --color-primary-400: #4785F5;
+  --color-primary-500: #1A65E0;
+  --color-primary-600: #1454C0;
+  --color-primary-700: #0F42A0;
+  --color-primary-800: #0B3380;
+  --color-primary-900: #082660;
 
-  /* ── Accent: Warm Amber (§3) ── */
-  --color-accent-50:  #FFF8E7;
-  --color-accent-100: #FFEFC2;
-  --color-accent-200: #FFE299;
-  --color-accent-300: #FFD166;
-  --color-accent-400: #F5BE3B;
-  --color-accent-500: #E8A317;
-  --color-accent-600: #C9880F;
-  --color-accent-700: #A06C0A;
+  /* ── Accent: Gold ── */
+  --color-accent-50:  #FFF9E6;
+  --color-accent-100: #FFF0BF;
+  --color-accent-200: #FFE494;
+  --color-accent-300: #FFD666;
+  --color-accent-400: #F5C53A;
+  --color-accent-500: #E6AD1A;
+  --color-accent-600: #CC9610;
+  --color-accent-700: #A67A0A;
 
-  /* ── Neutrals: Warm Gray (§3) ── */
+  /* ── Neutrals: Off White → Black 02 ── */
   --color-neutral-0:   #FFFFFF;
-  --color-neutral-50:  #FAFAF8;
-  --color-neutral-100: #F5F5F0;
-  --color-neutral-200: #E8E8E3;
-  --color-neutral-300: #D4D4CF;
-  --color-neutral-400: #A3A39E;
-  --color-neutral-500: #737370;
-  --color-neutral-600: #525250;
-  --color-neutral-700: #3D3D3B;
-  --color-neutral-800: #292928;
-  --color-neutral-900: #1A1A19;
+  --color-neutral-50:  #f0f0f0;
+  --color-neutral-100: #e6e6e6;
+  --color-neutral-200: #d4d4d4;
+  --color-neutral-300: #bbbbbb;
+  --color-neutral-400: #999999;
+  --color-neutral-500: #6e6e6e;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #3a3a3a;
+  --color-neutral-800: #2a2a2a;
+  --color-neutral-900: #1e1e1e;
 
-  /* ── Semantic (§3) ── */
+  /* ── Semantic ── */
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-error:   #EF4444;
   --color-info:    #3B82F6;
 
-  /* ── Shadows: Warm, not cold (§5) ── */
-  --shadow-sm: 0 1px 2px rgba(26, 26, 25, 0.05);
-  --shadow-md: 0 2px 8px rgba(26, 26, 25, 0.08);
-  --shadow-lg: 0 4px 16px rgba(26, 26, 25, 0.10);
-  --shadow-xl: 0 8px 32px rgba(26, 26, 25, 0.12);
+  /* ── Shadows (using neutral-900 base) ── */
+  --shadow-sm: 0 1px 2px rgba(30, 30, 30, 0.05);
+  --shadow-md: 0 2px 8px rgba(30, 30, 30, 0.08);
+  --shadow-lg: 0 4px 16px rgba(30, 30, 30, 0.10);
+  --shadow-xl: 0 8px 32px rgba(30, 30, 30, 0.12);
 
-  /* ── Radius tokens (§5) ── */
+  /* ── Radius tokens ── */
   --radius-sm:  6px;
   --radius-md:  8px;
   --radius-lg:  12px;
@@ -71,7 +73,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    /* Animation timing tokens (§8) */
+    /* Animation timing tokens */
     --duration-fast:   150ms;
     --duration-normal: 250ms;
     --duration-slow:   400ms;
@@ -84,6 +86,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
     @apply text-neutral-900 font-bold tracking-tight;
   }
 
@@ -92,9 +95,9 @@
   }
 }
 
-/* ── Utility layer: Stella component patterns (§6) ── */
+/* ── Utility layer: Stella component patterns ── */
 @layer utilities {
-  /* Primary button — teal, trust-colored */
+  /* Primary button — blue, trust-colored */
   .btn-primary {
     @apply h-12 px-6 rounded-lg bg-primary-500 text-white font-semibold
            transition-all duration-150 cursor-pointer
@@ -114,7 +117,7 @@
            flex items-center justify-center gap-2;
   }
 
-  /* Danger button — for clawback / destructive actions */
+  /* Danger button — for destructive actions */
   .btn-danger {
     @apply h-12 px-6 rounded-lg bg-error text-white font-semibold
            transition-all duration-150 cursor-pointer
@@ -124,7 +127,7 @@
            flex items-center justify-center gap-2;
   }
 
-  /* Card — white on warm bg */
+  /* Card — white on neutral bg */
   .card-stella {
     @apply bg-white border border-neutral-200 rounded-xl p-5 shadow-md
            flex flex-col gap-4;
@@ -148,9 +151,16 @@
   .label-section {
     @apply text-xs font-bold text-neutral-400 uppercase tracking-wider;
   }
+
+  /* Display font utility — for hero text and headings that need it */
+  .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "slnt" 0, "wdth" 100, "GRAD" 0, "ROND" 0;
+  }
 }
 
-/* ── Reduced motion (§8) ── */
+/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
