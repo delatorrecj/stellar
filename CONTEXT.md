@@ -1,7 +1,7 @@
 # 🚀 Stellar Bootcamp 2026 — Context & Battle Plan
 
-> **Last Updated:** 2026-04-18 08:50 PHT  
-> **Status:** 🟢 Environment Ready — Waiting for Bootcamp  
+> **Last Updated:** 2026-04-18 09:01 PHT  
+> **Status:** 🟢 Fully Ready — Waiting for Bootcamp (4 PM)  
 > **Event:** Stellar Bootcamp (Offline) — Whitecloak Office, Ortigas, Manila  
 > **Date:** April 18, 2026 | Duration: 4 hours (4:00 PM - 8:00 PM)
 
@@ -120,7 +120,7 @@ impl MyContract {
 | **Stellar CLI** | ✅ v26.0.0 | Installed via winget (pre-built binary) |
 | **Testnet Identity** | ✅ `my-key` | Public: `GABTUX53227CZQJSRKS6UMT2VWUZCLX27AGCDLHRS7VYJJB4DBIMHKIU` |
 | **Funded Testnet Account** | ✅ Funded | 10,000 test XLM via Friendbot |
-| **Freighter Wallet** | ❓ Check browser | Install from https://www.freighter.app/ |
+| **Freighter Wallet** | ✅ v5.39.0 (Testnet) | Public: `GCDBINSYWE36SRQKGU7F43MX3T2Z6VGWR6HFEGMLWGKSNYEK2WNZXE57` |
 
 ### 🔧 Setup Instructions (Run These in Order)
 
@@ -376,7 +376,9 @@ c:\Users\delat\OneDrive\Desktop\stella\
 | 08:50 | `.gitignore` hardened (secrets protection) | ✅ |
 | 08:50 | CONTEXT.md updated with full progress | ✅ |
 | 08:52 | Testnet account funded (10,000 test XLM) | ✅ |
-| — | Freighter wallet set up | ⏳ Install in Chrome |
+| — | Freighter wallet set up | ✅ |
+| 09:01 | Freighter v5.39.0 on Testnet, address saved | ✅ |
+| 09:01 | `.env` updated with Freighter public key | ✅ |
 | — | Contract assigned (at bootcamp) | 🔲 Waiting for session |
 | — | Contract completed | 🔲 |
 | — | Tests passing (3+) | 🔲 |
