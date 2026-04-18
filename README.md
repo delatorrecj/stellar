@@ -12,6 +12,27 @@ Stella bridges the trust gap between employers and job candidates during onboard
 
 ## Architecture
 
+### System Design
+```mermaid
+graph TD
+    subgraph Client ["Client Side (Browser)"]
+        UI["React Web App (Vite/TS)"] <--> |"Sign Transactions"| W["Freighter Wallet"]
+    end
+    
+    subgraph Stellar ["Stellar Network (Testnet)"]
+        RPC["Soroban RPC"]
+        SC{"Stella Smart Contract"}
+    end
+    
+    UI --> |"Builds & Submits XDR via Stellar SDK"| RPC
+    RPC --> |"Executes on Ledger"| SC
+    
+    SC -.-> |"Employer"| Init["init_escrow()"]
+    SC -.-> |"Candidate"| Unlock["unlock_milestone()"]
+    SC -.-> |"Employer"| Clawback["clawback()"]
+```
+
+### Directory Structure
 ```
 stella/
 ├── contract/          Soroban smart contract (Rust)
@@ -28,8 +49,12 @@ stella/
 │       ├── hooks/     useStellar (wallet), useEscrow (contract)
 │       └── lib/       Soroban client, network config
 │
-├── BRAND.md           Design system & brand guidelines
-├── PRD.md             Product requirements document
+├── docs/              Documentation & Specifications
+│   ├── branding.md
+│   ├── build.md
+│   ├── context.md
+│   └── product_requirements.md
+│
 └── README.md          ← You are here
 ```
 

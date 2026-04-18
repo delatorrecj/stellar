@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  Star,
   LogOut,
   ArrowLeft,
   Menu,
@@ -27,7 +26,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { role, reset } = useOnboarding();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
-  const isPreOnboarding = location.pathname === '/' || location.pathname === '/onboarding';
   const truncatedAddress = address ? `${address.slice(0, 4)}...${address.slice(-4)}` : null;
 
   const handleSwitchRole = () => {

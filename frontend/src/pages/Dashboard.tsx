@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Users, UserCheck, Star, ArrowRight, ShieldCheck, Banknote, Briefcase, ChevronRight, Lock, Target, AlertTriangle } from 'lucide-react';
+import { Users, UserCheck, Star, ArrowRight, ShieldCheck, Briefcase, ChevronRight, Lock, Target, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { useStellar } from '../hooks/useStellar';
