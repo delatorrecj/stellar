@@ -2,7 +2,7 @@
 
 <div align="center">
   <img src="frontend/public/S.svg" alt="Stella Logo" width="120"/>
-  <h1>Stella — Secure Your Onboarding</h1>
+  <h1>Stella</h1>
   
   <p><strong>A milestone-based escrow dApp built on Soroban to end the Day Zero poverty trap for fresh graduates.</strong></p>
 
