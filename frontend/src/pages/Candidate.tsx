@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Target, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEscrow } from '../hooks/useEscrow';
@@ -13,8 +13,7 @@ export const Candidate: React.FC = () => {
   const navigate = useNavigate();
   const { address } = useStellar();
   const { role } = useOnboarding();
-  const { fetchEscrow, claimMilestone, escrow, loading, error, lastTxHash, clearError } = useEscrow();
-  const [claimAmount, setClaimAmount] = useState('');
+  const { fetchEscrow, escrow, error, lastTxHash, clearError } = useEscrow();
 
   // Guard: must be onboarded as candidate
   useEffect(() => {
@@ -30,18 +29,14 @@ export const Candidate: React.FC = () => {
     }
   }, [address, fetchEscrow]);
 
-  const handleClaim = async () => {
-    if (!claimAmount) return;
-    try {
-      await claimMilestone(claimAmount);
-      setClaimAmount('');
-      fetchEscrow();
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
+  const handleClaim = async () => {}; // No longer needed
   const truncatedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
+
+  const total = escrow ? Number(escrow.total_amount) / 10_000_000 : 0;
+  const unlocked = escrow ? Number(escrow.unlocked_amount) / 10_000_000 : 0;
+  const remaining = total - unlocked;
+  const progressPercent = total > 0 ? (unlocked / total) * 100 : 0;
+  const deadlineDays = escrow ? Math.max(0, Math.ceil((Number(escrow.deadline) - Date.now() / 1000) / 86400)) : 0;
 
   return (
     <div className="flex flex-col gap-8">
@@ -54,10 +49,10 @@ export const Candidate: React.FC = () => {
         <p className="text-sm text-neutral-400 font-mono">{truncatedAddress}</p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Fund details */}
-        <div className="lg:col-span-8">
-          <div className="card-stella p-6 lg:p-8">
+        <div>
+          <div className="card-stella p-6 lg:p-8 border-accent-100">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-accent-50 rounded-xl flex items-center justify-center">
@@ -68,7 +63,7 @@ export const Candidate: React.FC = () => {
               {escrow && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary-50 text-primary-700 text-xs font-bold rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                  Secured
+                  Secured & Trustless
                 </span>
               )}
             </div>
@@ -79,26 +74,33 @@ export const Candidate: React.FC = () => {
                   <div>
                     <p className="label-section mb-1">Total Locked</p>
                     <p className="text-2xl font-extrabold text-neutral-900">
-                      500.00 <span className="text-neutral-400 text-base font-semibold">XLM</span>
+                      {total.toFixed(2)} <span className="text-neutral-400 text-base font-semibold">XLM</span>
                     </p>
                   </div>
                   <div>
-                    <p className="label-section mb-1">Remaining</p>
+                    <p className="label-section mb-1">Remaining to Release</p>
                     <p className="text-2xl font-extrabold text-primary-600">
-                      350.00 <span className="text-primary-300 text-base font-semibold">XLM</span>
+                      {remaining.toFixed(2)} <span className="text-primary-300 text-base font-semibold">XLM</span>
                     </p>
                   </div>
                 </div>
 
                 <div className="pt-6 border-t border-neutral-100">
-                  <p className="label-section mb-3">Progress</p>
+                  <p className="label-section mb-3">Escrow Progress</p>
                   <div className="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
-                    <div className="bg-primary-500 h-full rounded-full" style={{ width: '30%' }} />
+                    <div className="bg-primary-500 h-full rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
                   </div>
                   <div className="flex justify-between mt-2">
-                    <span className="text-xs font-semibold text-neutral-400">150.00 XLM claimed</span>
-                    <span className="text-xs font-semibold text-neutral-500">28 days remaining</span>
+                    <span className="text-xs font-semibold text-neutral-400">{unlocked.toFixed(2)} XLM released</span>
+                    <span className="text-xs font-semibold text-neutral-500">{deadlineDays} days secured</span>
                   </div>
+                </div>
+                
+                <div className="mt-2 bg-neutral-50 p-4 rounded-lg flex gap-3 items-start border border-neutral-100">
+                  <Gift className="w-5 h-5 text-accent-500 shrink-0 mt-0.5" />
+                  <p className="text-xs text-neutral-500 leading-relaxed">
+                    This dashboard provides cryptographically verifiable proof that your employer has locked these funds. Once you complete your milestones, your employer will trigger the release of funds directly to your wallet. If they do not, they cannot claw it back until the deadline expires.
+                  </p>
                 </div>
               </div>
             ) : (
@@ -108,45 +110,6 @@ export const Candidate: React.FC = () => {
                 </p>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Claim sidebar */}
-        <div className="lg:col-span-4">
-          <div className="card-stella p-6 bg-neutral-900 text-white border-neutral-800 sticky top-6">
-            <div className="flex items-center gap-2.5 mb-5">
-              <Gift className="w-5 h-5 text-accent-400" />
-              <h3 className="font-bold text-base">Claim Funds</h3>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-                  Amount to claim
-                </label>
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  className="w-full h-12 px-4 rounded-lg bg-white/5 border border-white/10
-                             text-white text-lg font-bold placeholder-white/20
-                             focus:outline-none focus:border-primary-400 transition-colors duration-150"
-                  value={claimAmount}
-                  onChange={(e) => setClaimAmount(e.target.value)}
-                />
-              </div>
-
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                By claiming, you confirm that the agreed work has been delivered to your employer.
-              </p>
-
-              <button
-                onClick={handleClaim}
-                disabled={loading || !escrow || !claimAmount}
-                className="btn-primary w-full"
-              >
-                {loading ? 'Processing...' : 'Claim Funds'}
-              </button>
-            </div>
           </div>
         </div>
       </div>

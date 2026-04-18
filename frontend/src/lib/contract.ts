@@ -75,13 +75,14 @@ export const StellaClient = {
 
   /**
    * Prepares an unlock_milestone transaction
+   * The employer must be the sender now, as they authorize the release.
    */
-  async unlockMilestoneTx(candidate: string, amount: string) {
+  async unlockMilestoneTx(employer: string, candidate: string, amount: string) {
     if (!CONTRACT_ID) throw new Error('Contract ID not configured');
 
     const amountBigInt = BigInt(Math.floor(parseFloat(amount) * 10_000_000));
     const contract = new Contract(CONTRACT_ID);
-    const txBuilder = await getBuilder(candidate);
+    const txBuilder = await getBuilder(employer);
     
     const tx = txBuilder
       .addOperation(

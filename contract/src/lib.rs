@@ -124,21 +124,21 @@ impl StellaContract {
         candidate: Address,
         milestone_amount: i128,
     ) -> Result<(), StellaError> {
-        // STEP 1: Auth — candidate must sign
-        candidate.require_auth();
-
-        // STEP 2: Validate amount
-        if milestone_amount <= 0 {
-            return Err(StellaError::InvalidAmount);
-        }
-
-        // STEP 3: Load escrow
+        // STEP 1: Load escrow (moved up to get employer address)
         let key = DataKey::Escrow(candidate.clone());
         let mut escrow: Escrow = env
             .storage()
             .persistent()
             .get(&key)
             .ok_or(StellaError::EscrowNotFound)?;
+
+        // STEP 2: Auth — EMPLOYER must sign to approve the release of funds to candidate
+        escrow.employer.require_auth();
+
+        // STEP 3: Validate amount
+        if milestone_amount <= 0 {
+            return Err(StellaError::InvalidAmount);
+        }
 
         // STEP 4: Verify escrow is active
         if !escrow.is_active {
@@ -218,7 +218,12 @@ impl StellaContract {
             return Err(StellaError::EscrowInactive);
         }
 
-        // STEP 4: Calculate remaining balance
+        // STEP 4: Enforce deadline bounds — employer cannot clawback early
+        if env.ledger().timestamp() < escrow.deadline {
+            return Err(StellaError::DeadlineNotReached);
+        }
+
+        // STEP 5: Calculate remaining balance
         let remaining = escrow
             .total_amount
             .checked_sub(escrow.unlocked_amount)

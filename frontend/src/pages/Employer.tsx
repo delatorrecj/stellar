@@ -13,11 +13,12 @@ export const Employer: React.FC = () => {
   const navigate = useNavigate();
   const { address } = useStellar();
   const { role } = useOnboarding();
-  const { createEscrow, clawbackEscrow, fetchEscrow, loading, error, lastTxHash, clearError } = useEscrow();
+  const { createEscrow, clawbackEscrow, releaseMilestone, fetchEscrow, loading, error, lastTxHash, clearError } = useEscrow();
 
   const [candidate, setCandidate] = useState('');
   const [amount, setAmount] = useState('');
   const [searchTarget, setSearchTarget] = useState('');
+  const [releaseAmount, setReleaseAmount] = useState('');
   const [activeEscrow, setActiveEscrow] = useState<any>(null);
 
   // Guard: must be onboarded as employer
@@ -42,6 +43,18 @@ export const Employer: React.FC = () => {
       handleSearch();
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleRelease = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeEscrow || !searchTarget || !releaseAmount) return;
+    try {
+      await releaseMilestone(searchTarget, releaseAmount);
+      setReleaseAmount('');
+      handleSearch();
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -150,15 +163,26 @@ export const Employer: React.FC = () => {
               </div>
 
               <div>
-                <p className="label-section mb-1">Amount Locked</p>
+                <p className="label-section mb-1">Total Locked</p>
                 <p className="text-amount">
-                  100.00 <span className="text-neutral-400 text-base font-semibold">XLM</span>
+                  {(Number(activeEscrow.total_amount) / 10000000).toFixed(2)} <span className="text-neutral-400 text-base font-semibold">XLM</span>
                 </p>
+                <p className="text-xs font-semibold text-neutral-500 mt-1">Unlocked: {(Number(activeEscrow.unlocked_amount) / 10000000).toFixed(2)} XLM</p>
               </div>
 
-              <button onClick={handleClawback} disabled={loading} className="btn-danger w-full">
-                <RotateCcw size={16} />
-                Return Remaining Funds
+              <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-100 flex flex-col gap-3">
+                 <p className="text-sm font-semibold text-neutral-800">Approve Milestone Target</p>
+                 <form onSubmit={handleRelease} className="flex gap-2">
+                    <input type="number" step="0.0000001" placeholder="Amount (XLM)" className="input-field bg-white" value={releaseAmount} onChange={(e) => setReleaseAmount(e.target.value)} required />
+                    <button type="submit" disabled={loading} className="btn-primary shrink-0 px-4 text-xs">Release Funds</button>
+                 </form>
+              </div>
+
+              <div className="border-t border-neutral-200" />
+
+              <button onClick={handleClawback} disabled={loading} className="btn-danger w-full text-xs">
+                <RotateCcw size={14} />
+                Return Unclaimed Funds
               </button>
             </div>
           ) : (

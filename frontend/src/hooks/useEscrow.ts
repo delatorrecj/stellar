@@ -84,18 +84,18 @@ export const useEscrow = () => {
     }
   }, [address]);
 
-  const claimMilestone = useCallback(async (amount: string) => {
+  const releaseMilestone = useCallback(async (candidateAddress: string, amount: string) => {
     if (!address) throw new Error('Wallet not connected');
     setLoading(true);
     setError(null);
     setLastTxHash(undefined);
 
     try {
-      const tx = await StellaClient.unlockMilestoneTx(address, amount);
+      const tx = await StellaClient.unlockMilestoneTx(address, candidateAddress, amount);
       const hash = await submitTx(tx.toXDR());
       return hash;
     } catch (err: any) {
-      setError(err.message || 'Failed to claim milestone');
+      setError(err.message || 'Failed to release milestone');
       throw err;
     } finally {
       setLoading(false);
@@ -122,7 +122,7 @@ export const useEscrow = () => {
 
   return {
     createEscrow,
-    claimMilestone,
+    releaseMilestone,
     clawbackEscrow,
     fetchEscrow,
     escrow,

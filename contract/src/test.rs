@@ -9,7 +9,7 @@
 use crate::{StellaContract, StellaContractClient};
 use crate::types::StellaError;
 use soroban_sdk::{
-    testutils::Address as _,
+    testutils::{Address as _, Ledger as _},
     token::{StellarAssetClient, Client as TokenClient},
     Address, Env,
 };
@@ -119,6 +119,9 @@ fn test_clawback_returns_remaining() {
 
     // Record employer balance before clawback
     let employer_before = token_client.balance(&employer);
+
+    // Advance time past the deadline to allow clawback
+    _env.ledger().with_mut(|li| li.timestamp = 10_000_000_000);
 
     // Employer claws back remaining 300 XLM
     let returned = client.clawback(&candidate);

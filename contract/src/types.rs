@@ -88,4 +88,7 @@ pub enum StellaError {
 
     /// Error 8: Amount must be greater than zero.
     InvalidAmount = 8,
+
+    /// Error 9: Deadline not yet reached.
+    DeadlineNotReached = 9,
 }
