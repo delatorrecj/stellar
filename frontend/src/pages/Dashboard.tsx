@@ -37,12 +37,12 @@ export const Dashboard: React.FC = () => {
         1. HERO SECTION
         ========================================
       */}
-      <section className="relative px-6 py-20 lg:py-32 overflow-hidden">
+      <section className="relative px-6 min-h-screen flex flex-col items-center justify-center overflow-hidden w-full">
         {/* Background Gradients */}
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary-100/40 rounded-full blur-[100px] -z-10 animate-float pointer-events-none" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-accent-100/30 rounded-full blur-[100px] -z-10 animate-float-delayed pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto text-center mt-8 glass-panel p-8 lg:p-16 rounded-[3rem] relative overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center w-full glass-panel p-8 lg:p-16 rounded-[3rem] relative overflow-hidden">
           {/* Faint dot pattern inside glass */}
           <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(#1e1e1e 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
           
@@ -57,7 +57,7 @@ export const Dashboard: React.FC = () => {
             </h1>
             
             <p className="text-lg lg:text-xl text-neutral-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-              A programmable pre-employment escrow protecting employers from candidate drop-off, while giving graduates the liquidity they need for Day 1.
+              A programmable pre-employment escrow protecting employers from candidate drop-off, while giving graduates the liquidity they need.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
@@ -83,28 +83,39 @@ export const Dashboard: React.FC = () => {
 
       {/* 
         ========================================
-        HERO QR CODE BANNER 
+        QR CODE ACCESS SECTION 
         ========================================
       */}
-      <section className="px-6 pb-24 bg-neutral-50 relative z-20 -mt-10 lg:-mt-16">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-6">
-          <div className="glass-panel p-4 rounded-3xl flex items-center gap-6 hover:-translate-y-1 hover:shadow-lg hover:border-white transition-all duration-300 w-full sm:w-auto hover:scale-[1.02]">
-            <div className="flex flex-col gap-1.5 items-end text-right pl-2">
-              <span className="text-[10px] font-bold text-accent-600 uppercase tracking-widest bg-accent-50 px-2 py-0.5 rounded-full inline-block w-fit ml-auto">Live dApp</span>
-              <span className="font-display font-bold text-neutral-900 text-lg">Scan to Launch</span>
-            </div>
-            <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-neutral-100/50">
-              <img src="/qr-stella.svg" alt="Stella dApp QR" className="w-20 h-20" />
-            </div>
+      <section className="px-6 py-24 bg-white relative z-20 border-b border-neutral-100">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl lg:text-4xl font-extrabold text-neutral-900 mb-4">
+              Experience Stella Instantly
+            </h2>
+            <p className="text-neutral-500 max-w-2xl mx-auto">
+              Scan the codes below to access the live dApp directly on your mobile device, or check out our open-source Soroban smart contracts on GitHub.
+            </p>
           </div>
           
-          <div className="glass-panel p-4 rounded-3xl flex items-center gap-6 hover:-translate-y-1 hover:shadow-lg hover:border-white transition-all duration-300 w-full sm:w-auto hover:scale-[1.02]">
-            <div className="flex flex-col gap-1.5 items-end text-right pl-2">
-              <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest bg-neutral-100 px-2 py-0.5 rounded-full inline-block w-fit ml-auto">Open Source</span>
-              <span className="font-display font-bold text-neutral-900 text-lg">View on GitHub</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-12 lg:gap-24">
+            <div className="flex flex-col items-center">
+              <div className="glass-panel p-6 rounded-[2rem] hover:-translate-y-2 hover:shadow-2xl hover:border-primary-200 transition-all duration-500 mb-6 bg-white/50">
+                <div className="bg-white p-4 rounded-3xl shadow-sm border border-neutral-100/50">
+                  <img src="/qr-stella.svg" alt="Stella dApp QR" className="w-48 h-48 lg:w-56 lg:h-56" />
+                </div>
+              </div>
+              <span className="text-sm font-bold text-accent-600 uppercase tracking-widest bg-accent-50 px-3 py-1 rounded-full mb-3 shadow-[0_0_15px_rgba(230,173,26,0.3)]">Live dApp</span>
+              <span className="font-display font-bold text-neutral-900 text-2xl">Scan to Launch</span>
             </div>
-            <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-neutral-100/50">
-              <img src="/qr-github.svg" alt="GitHub Repo QR" className="w-20 h-20" />
+            
+            <div className="flex flex-col items-center">
+              <div className="glass-panel p-6 rounded-[2rem] hover:-translate-y-2 hover:shadow-2xl hover:border-neutral-300 transition-all duration-500 mb-6 bg-white/50">
+                <div className="bg-white p-4 rounded-3xl shadow-sm border border-neutral-100/50">
+                  <img src="/qr-github.svg" alt="GitHub Repo QR" className="w-48 h-48 lg:w-56 lg:h-56" />
+                </div>
+              </div>
+              <span className="text-sm font-bold text-neutral-500 uppercase tracking-widest bg-neutral-100 px-3 py-1 rounded-full mb-3">Open Source</span>
+              <span className="font-display font-bold text-neutral-900 text-2xl">View on GitHub</span>
             </div>
           </div>
         </div>
