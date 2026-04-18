@@ -44,7 +44,7 @@ export const Dashboard: React.FC = () => {
 
         <div className="max-w-4xl mx-auto text-center mt-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-700 text-sm font-semibold mb-6 border border-primary-100 shadow-sm">
-            <Star className="w-4 h-4 fill-primary-600/20" />
+            <img src="/S.svg" className="w-4 h-4" alt="Stella" />
             <span>Built on Soroban Smart Contracts</span>
           </div>
           
@@ -286,7 +286,7 @@ export const Dashboard: React.FC = () => {
       {/* Footer */}
       <footer className="py-8 text-center bg-white border-t border-neutral-100">
         <p className="text-sm font-semibold text-neutral-400 flex items-center justify-center gap-2">
-          <Star className="w-4 h-4 fill-neutral-300" /> 
+          <img src="/S.svg" className="w-4 h-4 opacity-50 grayscale" alt="Stella" /> 
           Stella Escrow Protocol • Built for the Stellar Bootcamp
         </p>
       </footer>

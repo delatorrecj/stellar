@@ -42,7 +42,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="antialiased text-neutral-600 bg-neutral-50 min-h-screen">
         <header className="absolute top-0 left-0 right-0 z-50 h-20 flex items-center justify-between px-6 lg:px-12">
           <Link to="/" className="flex items-center gap-2 no-underline">
-            <Star className="w-6 h-6 text-accent-500 fill-accent-500" />
+            <img src="/S.svg" className="w-8 h-8" alt="Stella" />
             <span className="text-xl font-bold tracking-tight text-neutral-900">Stella</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -64,7 +64,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="min-h-screen bg-neutral-50 antialiased text-neutral-600">
         <header className="h-16 flex items-center justify-center px-5">
           <Link to="/" className="flex items-center gap-2 no-underline">
-            <Star className="w-4 h-4 text-accent-500 fill-accent-500" />
+            <img src="/S.svg" className="w-6 h-6" alt="Stella" />
             <span className="text-lg font-bold tracking-tight text-neutral-900">Stella</span>
           </Link>
         </header>
@@ -82,7 +82,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-neutral-200 p-5 z-50">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 px-2 mb-8 no-underline">
-          <Star className="w-4 h-4 text-accent-500 fill-accent-500" />
+          <img src="/S.svg" className="w-6 h-6" alt="Stella" />
           <span className="text-lg font-bold tracking-tight text-neutral-900">Stella</span>
         </Link>
 
@@ -129,7 +129,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <header className="h-14 bg-white border-b border-neutral-200 flex items-center justify-between px-5 z-40 shrink-0">
           {/* Mobile: logo + role */}
           <div className="lg:hidden flex items-center gap-2">
-            <Star className="w-4 h-4 text-accent-500 fill-accent-500" />
+            <img src="/S.svg" className="w-6 h-6" alt="Stella" />
             <span className="text-sm font-bold tracking-tight text-neutral-900">Stella</span>
             <span className="text-xs font-semibold text-primary-500 ml-1">
               {role === 'employer' ? 'Employer' : 'Candidate'}
@@ -181,7 +181,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-accent-500 fill-accent-500" />
+                <img src="/S.svg" className="w-6 h-6" alt="Stella" />
                 <span className="font-bold text-lg tracking-tight text-neutral-900">Stella</span>
               </div>
               <button onClick={() => setIsMobileMenuOpen(false)} aria-label="Close menu">
