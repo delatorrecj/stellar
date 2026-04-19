@@ -43,7 +43,7 @@ export const Dashboard: React.FC = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center mt-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-700 text-sm font-semibold mb-6 border border-primary-100 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-700 text-sm font-semibold mb-10 border border-primary-100 shadow-sm">
             <img src="/S.svg" className="w-4 h-4" alt="Stella" />
             <span>Built on Soroban Smart Contracts</span>
           </div>
@@ -78,14 +78,14 @@ export const Dashboard: React.FC = () => {
           <div className="mt-16 flex flex-col sm:flex-row justify-center items-center gap-8 lg:gap-16">
             <div className="flex flex-col items-center">
               <a href="https://stella-escrow.vercel.app" target="_blank" rel="noreferrer" className="block transition-transform hover:scale-105">
-                <img src="/qr-stella.svg" alt="Scan to open Stella App" className="w-32 h-32 lg:w-40 lg:h-40 p-2 bg-white rounded-2xl shadow-sm border border-neutral-100" />
+                <img src="/qr-stella.svg" alt="Scan to open Stella App" className="w-28 h-28 lg:w-36 lg:h-36 p-2 bg-white rounded-2xl shadow-sm border border-neutral-100" />
               </a>
               <span className="mt-3 text-sm font-semibold text-neutral-600">Scan for Web App</span>
             </div>
             
             <div className="flex flex-col items-center">
               <a href="https://github.com/delatorrecj/stellar" target="_blank" rel="noreferrer" className="block transition-transform hover:scale-105">
-                <img src="/qr-github.svg" alt="Scan to view GitHub Repo" className="w-32 h-32 lg:w-40 lg:h-40 p-2 bg-white rounded-2xl shadow-sm border border-neutral-100" />
+                <img src="/qr-github.svg" alt="Scan to view GitHub Repo" className="w-28 h-28 lg:w-36 lg:h-36 p-2 bg-white rounded-2xl shadow-sm border border-neutral-100" />
               </a>
               <span className="mt-3 text-sm font-semibold text-neutral-600">Scan for GitHub Repo</span>
             </div>

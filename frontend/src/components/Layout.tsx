@@ -39,15 +39,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   if (location.pathname === '/') {
     return (
       <div className="antialiased text-neutral-600 bg-neutral-50 min-h-screen">
-        <header className="absolute top-0 left-0 right-0 z-50 h-20 flex items-center justify-between px-6 lg:px-12">
-          <Link to="/" className="flex items-center gap-2 no-underline">
-            <img src="/S.svg" className="w-8 h-8" alt="Stella" />
-            <span className="text-xl font-bold tracking-tight text-neutral-900">Stella</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <a href="#cta-section" onClick={(e) => { e.preventDefault(); document.getElementById('cta-section')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-sm font-semibold text-neutral-600 hover:text-primary-600 transition-colors">
-              Sign Up
-            </a>
+        <header className="absolute top-0 left-0 right-0 z-50 h-20 w-full flex justify-center">
+          <div className="max-w-7xl w-full h-full flex items-center justify-between px-6 lg:px-8">
+            <Link to="/" className="flex items-center gap-2 no-underline">
+              <img src="/S.svg" className="w-8 h-8" alt="Stella" />
+              <span className="text-xl font-bold tracking-tight text-neutral-900">Stella</span>
+            </Link>
+            <div className="flex items-center gap-4">
+              <a href="#cta-section" onClick={(e) => { e.preventDefault(); document.getElementById('cta-section')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-sm font-semibold text-neutral-600 hover:text-primary-600 transition-colors">
+                Sign Up
+              </a>
+            </div>
           </div>
         </header>
         <main>

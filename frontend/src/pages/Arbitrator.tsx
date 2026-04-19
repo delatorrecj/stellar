@@ -58,7 +58,6 @@ export const Arbitrator: React.FC = () => {
         <div className="flex gap-2">
           <div className="flex-1">
             <AddressInput
-              label="Candidate Public Key"
               value={candidateSearch}
               onChange={(val) => setCandidateSearch(val)}
               placeholder="Candidate Public Key (G...)"

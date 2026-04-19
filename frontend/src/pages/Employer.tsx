@@ -34,6 +34,22 @@ export const Employer: React.FC = () => {
 
   // Manage panel
   const [searchTarget, setSearchTarget] = useState('');
+  const [recentCandidates, setRecentCandidates] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('stella_employer_recent') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
+  const saveCandidate = (pubKey: string) => {
+    if (!pubKey || pubKey.length < 50) return;
+    setRecentCandidates((prev) => {
+      const updated = [pubKey, ...prev.filter((k) => k !== pubKey)].slice(0, 5);
+      localStorage.setItem('stella_employer_recent', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   // Guard
   useEffect(() => {
@@ -63,6 +79,7 @@ export const Employer: React.FC = () => {
 
   const handleSearch = async () => {
     if (!searchTarget) return;
+    saveCandidate(searchTarget);
     await fetchEscrow(searchTarget);
   };
 
@@ -77,6 +94,7 @@ export const Employer: React.FC = () => {
       ]);
       setDurationDays('30');
       setSearchTarget(candidate);
+      saveCandidate(candidate);
       await fetchEscrow(candidate);
     } catch (err) {
       console.error(err);
@@ -363,9 +381,30 @@ export const Employer: React.FC = () => {
           ) : (
             <div className="flex flex-col items-center justify-center text-center py-10">
               <Wallet size={36} className="text-neutral-300 mb-3" />
-              <p className="text-sm font-semibold text-neutral-400">
+              <p className="text-sm font-semibold text-neutral-400 mb-6">
                 Search for a candidate to manage their locked funds
               </p>
+              
+              {recentCandidates.length > 0 && (
+                <div className="w-full text-left">
+                  <p className="text-xs font-bold text-neutral-400 uppercase mb-2">Recent</p>
+                  <div className="flex flex-col gap-2">
+                    {recentCandidates.map((recentKey) => (
+                      <button
+                        key={recentKey}
+                        onClick={() => {
+                          setSearchTarget(recentKey);
+                          fetchEscrow(recentKey);
+                        }}
+                        className="text-left p-3 rounded-lg border border-neutral-100 hover:border-primary-200 hover:bg-primary-50 transition-colors"
+                      >
+                        <p className="text-sm font-bold text-neutral-900 mb-0.5">Candidate</p>
+                        <p className="text-xs font-mono text-neutral-500 truncate">{recentKey}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

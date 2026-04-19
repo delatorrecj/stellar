@@ -3,7 +3,7 @@ import { StrKey } from '@stellar/stellar-sdk';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface AddressInputProps {
-  label: string;
+  label?: string;
   value: string;
   onChange: (value: string, isValid: boolean) => void;
   placeholder?: string;
@@ -50,9 +50,11 @@ export const AddressInput: React.FC<AddressInputProps> = ({
 
   return (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-sm font-semibold text-neutral-700">
-        {label}
-      </label>
+      {label && (
+        <label className="text-sm font-semibold text-neutral-700">
+          {label}
+        </label>
+      )}
       <div className="relative">
         <input
           type="text"
