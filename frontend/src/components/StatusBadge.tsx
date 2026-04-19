@@ -1,35 +1,45 @@
 import React from 'react';
+import type { EscrowState } from '../lib/contract';
 
 /**
- * Escrow Status Types
+ * 🌠 Stella — Status Badge (V2.0)
+ * 
+ * State-aware status indicator with semantic colors.
  */
-export type EscrowStatus = 'DRAFT' | 'LOCKED' | 'RELEASED' | 'CLAWED_BACK';
 
 interface StatusBadgeProps {
-  status: EscrowStatus;
+  status: EscrowState;
 }
 
-const statusConfig: Record<EscrowStatus, { label: string; classes: string }> = {
-  DRAFT: {
-    label: 'Initialization',
-    classes: 'bg-neutral-100 text-neutral-600 border-neutral-200',
+const statusConfig: Record<EscrowState, { label: string; classes: string }> = {
+  Pending: {
+    label: 'Pending Acceptance',
+    classes: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
   },
-  LOCKED: {
-    label: 'Funds Locked',
-    classes: 'bg-primary-50 text-primary-600 border-primary-200',
+  Active: {
+    label: 'Funds Locked / Active',
+    classes: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
   },
-  RELEASED: {
+  Complete: {
     label: 'Completed',
-    classes: 'bg-success/10 text-success border-success/20',
+    classes: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
   },
-  CLAWED_BACK: {
-    label: 'Recovered',
-    classes: 'bg-error/10 text-error border-error/20',
+  Cancelled: {
+    label: 'Cancelled / Refunded',
+    classes: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
+  },
+  Disputed: {
+    label: 'In Dispute',
+    classes: 'bg-fuchsia-500/10 text-fuchsia-500 border-fuchsia-500/20',
+  },
+  Resolved: {
+    label: 'Resolved by Arbitrator',
+    classes: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20',
   },
 };
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig.Pending;
 
   return (
     <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border ${config.classes}`}>
@@ -38,8 +48,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   );
 };
 
-// Aliases for retro-compatibility with EscrowCard logic
-export const DraftBadge = () => <StatusBadge status="DRAFT" />;
-export const LockedBadge = () => <StatusBadge status="LOCKED" />;
-export const ReleasedBadge = () => <StatusBadge status="RELEASED" />;
-export const ClawedBackBadge = () => <StatusBadge status="CLAWED_BACK" />;
+export const DraftBadge = () => <StatusBadge status="Pending" />;
+export const LockedBadge = () => <StatusBadge status="Active" />;
+export const ReleasedBadge = () => <StatusBadge status="Complete" />;
+export const ClawedBackBadge = () => <StatusBadge status="Cancelled" />;

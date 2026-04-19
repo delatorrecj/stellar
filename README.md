@@ -27,7 +27,22 @@ Stella bridges the trust gap between employers and job candidates during onboard
 
 ## Architecture
 
-### System Design
+### System Design (V1.3 Multi-Milestone State Machine)
+
+```mermaid
+stateDiagram-v2
+    [*] --> Pending: Employer Lock Funds
+    Pending --> Active: Candidate Accept
+    Pending --> Cancelled: Employer Clawback
+    Active --> Active: unlock_milestone(id)
+    Active --> Complete: All Milestones Released
+    Active --> Cancelled: Employer Clawback (Unreleased)
+    Active --> Disputed: Candidate Raise Dispute (Post-Deadline)
+    Disputed --> Resolved: Arbitrator Resolve (BPS Split)
+    Complete --> [*]
+    Cancelled --> [*]
+    Resolved --> [*]
+```
 
 ```mermaid
 graph TD
@@ -44,12 +59,14 @@ graph TD
     RPC --> |"Executes on Ledger"| SC
 
     SC -.-> |"Employer"| Init["init_escrow()"]
+    SC -.-> |"Candidate"| Accept["candidate_accept()"]
     SC -.-> |"Employer"| Unlock["unlock_milestone()"]
-    SC -.-> |"Candidate"| Read["Candidate Views Dashboard"]
     SC -.-> |"Employer"| Clawback["clawback()"]
+    SC -.-> |"Candidate"| Dispute["raise_dispute()"]
+    SC -.-> |"Arbitrator"| Resolve["resolve_dispute()"]
 ```
 
-> **Note on Programmatic Trust (V1 vs V2):** For the purpose of this bootcamp MVP (V1), Stella acts as a generalized unlockable vault where the employer specifies the raw XLM amount to release dynamically. V2 will feature zero-knowledge on-chain milestone hashing for pre-determined arrays of deliverables.
+> **V2.0 Spotlight:** Introducing the **Dispute Resolution Engine**. Candidates can now raise a formal dispute if a contract passes its deadline without full release. A designated platform arbitrator reviews contributions and executes an on-chain split (BPS-based) to ensure fairness.
 
 ### Directory Structure
 
@@ -57,38 +74,38 @@ graph TD
 stella/
 ├── contract/          Soroban smart contract (Rust)
 │   └── src/
-│       ├── lib.rs     Core escrow logic (Single-Job Overwrite Fixed)
-│       ├── test.rs    Unit tests (3+ passing)
-│       ├── types.rs   Data structures
-│       └── events.rs  On-chain event definitions
+│       ├── lib.rs     Dispute Resolution & Lifecycle Logic
+│       ├── test.rs    25 performance-graded unit tests
+│       ├── types.rs   Disputed/Resolved state machine
+│       └── events.rs  DisputeRaised & DisputeResolved events
 │
-├── frontend/          React + Vite dApp (PWA Ready)
+├── frontend/          React + Vite dApp (PWA)
 │   └── src/
-│       ├── pages/     Dashboard, Employer, Candidate
-│       ├── components/ Layout, WalletButton, EscrowCard, Toast
-│       ├── hooks/     useStellar (wallet), useEscrow (contract)
-│       └── lib/       Soroban client, network config
+│       ├── pages/     Employer, Candidate, Arbitrator (Resolution Dash)
+│       ├── hooks/     useEscrow (Dispute Guards & Polling)
+│       ├── lib/       Contract Client & RPC Node Pool
+│       └── components/ TransactionToasts & UI Primitives
 │
-├── docs/              Documentation & Specifications
-│   ├── branding.md
-│   ├── build.md
-│   ├── context.md
-│   └── product_requirements.md
-│
+├── docs/              Full project documentation
 └── README.md          ← You are here
 ```
 
-## Smart Contract
+## Smart Contract (V1.3)
 
-| Function           | Description                           |
-| ------------------ | ------------------------------------- |
-| `init_escrow`      | Lock onboarding funds (with duration) |
-| `unlock_milestone` | Employer releases partial amount      |
-| `clawback`         | Employer recovers remaining funds     |
-| `get_escrow`       | View escrow details for a candidate   |
+| Function           | Description                                   | Guard           |
+| ------------------ | --------------------------------------------- | --------------- |
+| `initialize`       | One-time setup (Admin + Native Token)         | Admin Only      |
+| `init_escrow`      | Create multi-milestone escrow (Locks Funds)   | Employer        |
+| `candidate_accept` | Transitions escrow Pending → Active           | Candidate       |
+| `unlock_milestone` | Releases specific funds to Candidate          | Employer        |
+| `clawback`         | Returns unreleased funds to Employer          | Employer        |
+| `raise_dispute`    | Flag contract for arbitration (Post-Deadline) | Candidate       |
+| `resolve_dispute`  | Final fund split by trusted third-party       | Arbitrator Only |
+| `get_escrow`       | Fetches on-chain state & progress             | Public          |
 
-**Contract ID:** `CCYWJ3RXON6AUJT32ME522B3W5D5PMPG4CUEBJEI6UA3AKRF4SOXP5MU`
-**Network:** Stellar Testnet
+**Contract ID:** `CDA67YOAWOOMMSIW44IOQWDSB2P6PGG3PRH3WPFEFCM5BO3LGF7POHZL`
+**Network:** Stellar Testnet (V22)
+**Asset:** Native XLM (`CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`)
 
 ## Getting Started
 
@@ -117,12 +134,23 @@ stellar contract build
 
 ## Testing & Simulation
 
-To test the complete end-to-end flow locally, you can simulate both the Employer and Candidate using a single Freighter extension:
+To test the complete end-to-end flow locally, we have prepared a set of demo public keys. You can simulate the Employer, Candidate, and Arbitrator roles by setting up these accounts in your Freighter extension on **Testnet**.
 
-1. **Create Two Accounts**: Open Freighter, click the gear icon (Settings) -> Accounts -> **"Create new wallet"**. This generates a second account from your seed phrase. Rename them to **"Employer"** and **"Candidate"**.
-2. **Fund via Friendbot**: Ensure your network is set to **Testnet**. Select your "Employer" account and click "Fund with Friendbot" (or "Get test network lumens") to receive 10,000 test XLM. Do the same for the "Candidate" account.
-3. **Simulate the Employer**: With the "Employer" account active in Freighter, connect to the dApp and click "I'm hiring someone". Initiate an escrow by pasting the public key of your "Candidate" account.
-4. **Simulate the Candidate**: Once the escrow is funded and locked, switch your Freighter active account to "Candidate". Return to the dApp landing page, switch your role to Candidate, and you will securely see the funds waiting for you to claim!
+### Demo Accounts
+
+Feel free to use the following Testnet public keys for testing the application:
+
+- **Employer / Test Key:** `GCDBINSYWE36SRQKGU7F43MX3T2Z6VGWR6HFEGMLWGKSNYEK2WNZXE57`
+- **Arbitrator / Platform Key:** `GABTUX53227CZQJSRKS6UMT2VWUZCLX27AGCDLHRS7VYJJB4DBIMHKIU`
+- **Candidate Key (generate your own, or use):** `GBU2OXZY4M62YYQUMH77TMWN33G44YF3D7G4O75677R2BIF2D4DXY33G`
+
+### Walkthrough Flow:
+
+1. **Create Accounts in Freighter**: Open Freighter, click the gear icon (Settings) -> Accounts -> **"Create new wallet"**. You can import keys or generate new ones for Employer, Candidate, and Arbitrator roles.
+2. **Fund via Friendbot**: Ensure your network is set to **Testnet**. Select your account and click "Fund with Friendbot" (or "Get test network lumens") to receive 10,000 test XLM.
+3. **Simulate the Employer**: With the "Employer" account active in Freighter, connect to the dApp and click "I'm hiring someone". Initiate an escrow by pasting the public key of your Candidate account.
+4. **Simulate the Candidate**: Once the escrow is funded, switch your Freighter account to the Candidate. Disconnect/reconnect or refresh the dApp, switch your role to Candidate, and claim your milestone funds.
+5. **Simulate the Arbitrator (V2.0)**: If a dispute is raised post-deadline, switch to the Arbitrator account and use the Arbitration Center to finalize a BPS split.
 
 ## Tech Stack
 

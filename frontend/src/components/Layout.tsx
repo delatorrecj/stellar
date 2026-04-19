@@ -3,7 +3,8 @@ import {
   LogOut,
   ArrowLeft,
   Menu,
-  X
+  X,
+  Gavel
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStellar } from '../hooks/useStellar';
@@ -90,6 +91,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             {role === 'employer' ? '👥 Employer Mode' : '✓ Candidate Mode'}
           </p>
         </div>
+
+        {/* Global Nav */}
+        <nav className="flex flex-col gap-1">
+          <Link
+            to="/arbitrator"
+            className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all"
+          >
+            <Gavel size={16} />
+            Arbitration Center
+          </Link>
+        </nav>
 
         {/* Spacer */}
         <div className="flex-1" />
@@ -193,6 +205,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {role === 'employer' ? '👥 Employer Mode' : '✓ Candidate Mode'}
               </p>
             </div>
+
+            <nav className="mb-6">
+              <Link
+                to="/arbitrator"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-3 text-sm font-bold text-indigo-600 bg-indigo-50 rounded-xl"
+              >
+                <Gavel size={18} />
+                Arbitration Center
+              </Link>
+            </nav>
 
             <div className="flex-1" />
 

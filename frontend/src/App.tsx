@@ -5,6 +5,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Onboarding } from './pages/Onboarding';
 import { Employer } from './pages/Employer';
 import { Candidate } from './pages/Candidate';
+import { Arbitrator } from './pages/Arbitrator';
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/employer" element={<Employer />} />
           <Route path="/candidate" element={<Candidate />} />
+          <Route path="/arbitrator" element={<Arbitrator />} />
           {/* Catch-all: return to role selection */}
           <Route path="*" element={<Dashboard />} />
         </Routes>

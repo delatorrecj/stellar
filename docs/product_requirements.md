@@ -1,6 +1,6 @@
 # STELLA — PRODUCT REQUIREMENTS DOCUMENT
-> **Version:** 1.4.0 | **Status:** ACTIVE
-> **Last Updated:** 2026-04-18
+> **Version:** 2.0.0 | **Status:** ACTIVE
+> **Last Updated:** 2026-04-19
 > **Owner:** Jerico | **Event:** Stellar Philippines UniTour Bootcamp 2026
 > **IDE Directive:** This document is a living spec. Update version, status, and changelog on every meaningful change. Do not delete deprecated sections — mark them `[DEPRECATED vX.X.X]` and move to the Graveyard at the bottom.
 
@@ -112,7 +112,8 @@ Real money movement. Programmable trust. No intermediary.
 - [x] Candidate views pending escrow
 - [x] Candidate claims milestone payout
 - [x] Transaction hash displayed on success
-- [x] 3+ passing unit tests
+- [x] 25+ passing unit tests (T-01 to T-25)
+- [x] V2.0 Dispute Resolution system (Candidate-raised, Arbitrator-resolved)
 
 ### V1 — Post-Hackathon (Weeks 1–4)
 - [ ] Employer-approved milestone unlock (currently candidate self-claims)
@@ -186,10 +187,12 @@ Temporary Storage (in-flight ops only — do NOT use for escrow balances):
 ### Data Structures
 ```rust
 #[contracttype]
-pub enum DataKey {
-    Escrow(Address),
-    Admin,
-    Token,              // Stores the XLM SAC address (set during initialize)
+#[derive(Clone)]
+pub struct Milestone {
+    pub id: u32,
+    pub description: Symbol,
+    pub amount: i128,
+    pub released: bool,
 }
 
 #[contracttype]
@@ -197,10 +200,22 @@ pub enum DataKey {
 pub struct Escrow {
     pub employer: Address,
     pub candidate: Address,
-    pub total_amount: i128,
-    pub unlocked_amount: i128,
-    pub deadline: u64,       // UNIX timestamp — auto-clawback after this
-    pub is_active: bool,
+    pub token: Address,
+    pub milestones: Vec<Milestone>,
+    pub deadline: u64,
+    pub arbitrator: Address,
+    pub state: EscrowState,
+}
+
+#[contracttype]
+#[derive(Clone, PartialEq)]
+pub enum EscrowState {
+    Pending,
+    Active,
+    Complete,
+    Cancelled,
+    Disputed,
+    Resolved,
 }
 ```
 
@@ -257,27 +272,47 @@ Action:
 Errors: EscrowNotFound, NothingToClawback
 ```
 
-#### `get_escrow` (Read-only)
+#### `raise_dispute` (V2.0)
 ```
-Signature: get_escrow(env, candidate) → Escrow
-Auth: None required
-Action: Return escrow struct or panic with EscrowNotFound
+Signature: raise_dispute(env, candidate)
+Auth: candidate.require_auth()
+Action:
+  1. Verify escrow state is Active
+  2. Verify deadline has expired
+  3. Set state to Disputed
+  4. Emit DisputeRaised event
+```
+
+#### `resolve_dispute` (V2.0)
+```
+Signature: resolve_dispute(env, candidate, candidate_bps)
+Auth: arbitrator.require_auth()
+Action:
+  1. Verify escrow state is Disputed
+  2. Compute split (candidate_bps / 10,000)
+  3. Transfer candidate_split to candidate
+  4. Transfer remaining to employer
+  5. Set state to Resolved
+  6. Emit DisputeResolved event
 ```
 
 ### Error Enum
 ```rust
 #[contracterror]
-#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
-#[repr(u32)]
+#[derive(Copy, Clone)]
 pub enum StellaError {
-    EscrowAlreadyExists = 1,
-    EscrowNotFound      = 2,
-    EscrowInactive      = 3,
-    ExceedsTotal        = 4,
-    NothingToClawback   = 5,
-    Unauthorized        = 6,
-    InvalidDeadline     = 7,
-    InvalidAmount       = 8,
+    AlreadyInitialized   = 1,
+    NotInitialized       = 2,
+    Unauthorized         = 3,
+    InvalidAmount        = 4,
+    MilestoneNotFound    = 5,
+    AlreadyReleased      = 6,
+    NoFundsToClawback    = 7,
+    DeadlineExpired      = 8,
+    EmptyMilestones      = 9,
+    NotActive            = 10,
+    NotPending           = 11,
+    AlreadyAccepted      = 12,
 }
 ```
 
