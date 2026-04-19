@@ -132,25 +132,28 @@ cargo test
 stellar contract build
 ```
 
-## Testing & Simulation
+### Walkthrough & Testing Guide:
 
-To test the complete end-to-end flow locally, we have prepared a set of demo public keys. You can simulate the Employer, Candidate, and Arbitrator roles by setting up these accounts in your Freighter extension on **Testnet**.
+To test the complete end-to-end trust flow, we **mandate** using two separate browser profiles (or two different browsers like Chrome + Firefox). This allows you to simulate the Employer and Candidate side-by-side.
 
-### Demo Accounts
-
-Feel free to use the following Testnet public keys for testing the application:
-
-- **Employer / Test Key:** `GCDBINSYWE36SRQKGU7F43MX3T2Z6VGWR6HFEGMLWGKSNYEK2WNZXE57`
-- **Arbitrator / Platform Key:** `GABTUX53227CZQJSRKS6UMT2VWUZCLX27AGCDLHRS7VYJJB4DBIMHKIU`
-- **Candidate Key (generate your own, or use):** `GBU2OXZY4M62YYQUMH77TMWN33G44YF3D7G4O75677R2BIF2D4DXY33G`
-
-### Walkthrough Flow:
-
-1. **Create Accounts in Freighter**: Open Freighter, click the gear icon (Settings) -> Accounts -> **"Create new wallet"**. You can import keys or generate new ones for Employer, Candidate, and Arbitrator roles.
-2. **Fund via Friendbot**: Ensure your network is set to **Testnet**. Select your account and click "Fund with Friendbot" (or "Get test network lumens") to receive 10,000 test XLM.
-3. **Simulate the Employer**: With the "Employer" account active in Freighter, connect to the dApp and click "I'm hiring someone". Initiate an escrow by pasting the public key of your Candidate account.
-4. **Simulate the Candidate**: Once the escrow is funded, switch your Freighter account to the Candidate. Disconnect/reconnect or refresh the dApp, switch your role to Candidate, and claim your milestone funds.
-5. **Simulate the Arbitrator (V2.0)**: If a dispute is raised post-deadline, switch to the Arbitrator account and use the Arbitration Center to finalize a BPS split.
+1.  **Preparation**:
+    *   Install **Freighter** on both browser profiles.
+    *   Set both to **Stellar Testnet**.
+    *   Fund both wallets using the "Fund with Friendbot" button (10,000 test XLM each).
+2.  **Employer (Browser A)**:
+    *   Connect wallet and enter the portal.
+    *   Copy the **Candidate's address** from Browser B.
+    *   Lock funds: Enter the address, add 2-3 milestones (e.g., "Medical Exam" - 50 XLM, "NBI Clearance" - 100 XLM), set a deadline (30 days), and click **Lock Onboarding Funds**.
+3.  **Candidate (Browser B)**:
+    *   Connect wallet and enter the portal.
+    *   You will see a "Pending Acceptance" card. Review the milestones and click **Accept Escrow**.
+    *   *System Check*: The status in Browser A (Employer) will instantly flip to "Active".
+4.  **Release Funds (Browser A)**:
+    *   As the Employer, click **Release** on the first milestone.
+    *   *System Check*: The Candidate (Browser B) will see the milestone mark as paid, and their XLM balance (top right) will increase.
+5.  **Conflict Simulation (Disputes)**:
+    *   If a deadline expires and funds aren't released, the Candidate (Browser B) can click **Raise Formal Dispute**.
+    *   This transitions the escrow to `Disputed`. A platform arbitrator can then resolve it.
 
 ## Tech Stack
 

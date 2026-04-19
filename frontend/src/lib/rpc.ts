@@ -1,39 +1,57 @@
 /**
- * 🌠 Stella — RPC Fallback with Health Check
- * 
- * Tries multiple RPC nodes and returns the first healthy one.
- * Prevents single-point-of-failure for testnet outages.
+ * 🌠 Stella — RPC & Horizon Node Management
  */
-import { rpc } from '@stellar/stellar-sdk';
+import { rpc, Horizon } from '@stellar/stellar-sdk';
 
-const RPC_NODES = [
+const SOROBAN_RPC_NODES = [
   'https://soroban-testnet.stellar.org',
+];
+
+const HORIZON_NODES = [
   'https://horizon-testnet.stellar.org',
 ];
 
-let cachedServer: rpc.Server | null = null;
+let cachedSoroban: rpc.Server | null = null;
+let cachedHorizon: Horizon.Server | null = null;
 let lastHealthCheck = 0;
-const HEALTH_TTL = 30_000; // Re-check every 30 seconds
+const HEALTH_TTL = 30_000;
 
 /**
- * Returns a healthy RPC server. Caches for 30s to avoid spamming health checks.
+ * Returns a healthy Soroban RPC server.
  */
 export const getServer = async (): Promise<rpc.Server> => {
-  if (cachedServer && Date.now() - lastHealthCheck < HEALTH_TTL) {
-    return cachedServer;
+  if (cachedSoroban && Date.now() - lastHealthCheck < HEALTH_TTL) {
+    return cachedSoroban;
   }
 
-  for (const url of RPC_NODES) {
+  for (const url of SOROBAN_RPC_NODES) {
     try {
       const s = new rpc.Server(url);
-      await s.getLatestLedger(); // health check
-      cachedServer = s;
+      await s.getLatestLedger();
+      cachedSoroban = s;
       lastHealthCheck = Date.now();
       return s;
     } catch {
       continue;
     }
   }
+  throw new Error('Soroban RPC nodes unavailable.');
+};
 
-  throw new Error('All RPC nodes unavailable. Please try again later.');
+/**
+ * Returns a healthy Horizon server for balance lookups.
+ */
+export const getHorizonServer = async (): Promise<Horizon.Server> => {
+  if (cachedHorizon) return cachedHorizon;
+  
+  for (const url of HORIZON_NODES) {
+    try {
+      const s = new Horizon.Server(url);
+      cachedHorizon = s;
+      return s;
+    } catch {
+      continue;
+    }
+  }
+  throw new Error('Horizon nodes unavailable.');
 };

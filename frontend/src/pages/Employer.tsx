@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Search, RotateCcw, ShieldCheck, Wallet, Trash2, Check, Clock, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ActivityLedger from '../components/ActivityLedger';
 import { useEscrow } from '../hooks/useEscrow';
 import { useStellar } from '../hooks/useStellar';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { TransactionToast } from '../components/TransactionToast';
+import { AddressInput } from '../components/AddressInput';
 import type { MilestoneInput } from '../lib/contract';
 
 /**
@@ -17,7 +19,7 @@ import type { MilestoneInput } from '../lib/contract';
  */
 export const Employer: React.FC = () => {
   const navigate = useNavigate();
-  const { address } = useStellar();
+  const { address, balance, network } = useStellar();
   const { role } = useOnboarding();
   const {
     createEscrow, clawbackEscrow, releaseMilestone, fetchEscrow,
@@ -26,6 +28,7 @@ export const Employer: React.FC = () => {
 
   // Init form state
   const [candidate, setCandidate] = useState('');
+  const [isCandidateValid, setIsCandidateValid] = useState(false);
   const [durationDays, setDurationDays] = useState('30');
   const [milestones, setMilestones] = useState<MilestoneInput[]>([
     { description: 'Background Check', amount: '' },
@@ -85,19 +88,48 @@ export const Employer: React.FC = () => {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isCandidateValid) {
+      alert("Please enter a complete and valid Stellar address (56 characters).");
+      return;
+    }
+
+    // 1. Pre-flight Balance Check
+    const userBal = parseFloat(balance || '0');
+    if (userBal < totalXlm) {
+      alert(`Simulation will fail: Insufficient balance. You have ${userBal} XLM, but target lock is ${totalXlm.toFixed(2)} XLM.`);
+      return;
+    }
+
+    // 2. Network Check
+    const currentNetwork = String(network || '').toUpperCase();
+    if (currentNetwork && currentNetwork !== 'TESTNET') {
+       alert(`Network mismatch: Your wallet is on ${currentNetwork}. Please switch to TESTNET and try again.`);
+       return;
+    }
+
+    const currentCandidate = candidate; // Capture for search later
     try {
-      await createEscrow(candidate, milestones, Number(durationDays));
+      await createEscrow(currentCandidate, milestones, Number(durationDays));
+      
+      // Full reset of form fields
       setCandidate('');
+      setDurationDays('30');
       setMilestones([
         { description: 'Background Check', amount: '' },
         { description: 'Day 1 Onboarding', amount: '' },
       ]);
-      setDurationDays('30');
-      setSearchTarget(candidate);
-      saveCandidate(candidate);
-      await fetchEscrow(candidate);
-    } catch (err) {
+      
+      // Focus on the new escrow
+      setSearchTarget(currentCandidate);
+      saveCandidate(currentCandidate);
+      await fetchEscrow(currentCandidate);
+    } catch (err: any) {
       console.error(err);
+      // If it already exists, let's just search for it so the user can see it
+      if (err.message?.includes('13') || String(err).includes('already exists')) {
+        setSearchTarget(currentCandidate);
+        await fetchEscrow(currentCandidate);
+      }
     }
   };
 
@@ -182,11 +214,15 @@ export const Employer: React.FC = () => {
 
           <form onSubmit={handleCreate} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="label-section">Candidate wallet address</label>
-              <input
-                type="text" placeholder="G..."
-                className="input-field font-mono" value={candidate}
-                onChange={(e) => setCandidate(e.target.value)} required
+              <AddressInput
+                label="Candidate wallet address"
+                value={candidate}
+                onChange={(val, valid) => {
+                  setCandidate(val);
+                  setIsCandidateValid(valid);
+                }}
+                placeholder="G..."
+                helperText="Must be a full 56-character public key (starts with G)"
               />
             </div>
 
@@ -229,7 +265,7 @@ export const Employer: React.FC = () => {
             <div className="flex gap-4">
               <div className="flex flex-col gap-1.5 flex-1">
                 <label className="label-section">Total</label>
-                <div className="input-field bg-neutral-50 text-neutral-800 font-extrabold cursor-default">
+                <div className="input-field bg-neutral-50 text-neutral-800 font-extrabold cursor-default flex items-center gap-1">
                   {totalXlm.toFixed(2)} <span className="text-neutral-400 text-sm font-semibold">XLM</span>
                 </div>
               </div>
@@ -258,13 +294,15 @@ export const Employer: React.FC = () => {
           </div>
 
           {/* Search bar */}
-          <div className="flex gap-2 mb-6">
-            <input
-              type="text" placeholder="Candidate wallet address"
-              className="input-field bg-white font-mono" value={searchTarget}
-              onChange={(e) => setSearchTarget(e.target.value)}
-            />
-            <button onClick={handleSearch} className="btn-secondary px-4 shrink-0" aria-label="Search">
+          <div className="flex gap-2 mb-6 items-end">
+            <div className="flex-1">
+              <AddressInput
+                value={searchTarget}
+                onChange={(val) => setSearchTarget(val)}
+                placeholder="Candidate wallet address"
+              />
+            </div>
+            <button onClick={handleSearch} className="btn-secondary h-12 px-4 shrink-0" aria-label="Search">
               <Search size={18} />
             </button>
           </div>
@@ -407,14 +445,19 @@ export const Employer: React.FC = () => {
               )}
             </div>
           )}
+
+          {/* Activity Ledger Section */}
+          <div className="mt-12">
+            <ActivityLedger address={address} />
+          </div>
         </div>
       </div>
 
-      {lastTxHash && (
+      {(error || lastTxHash) && (
         <TransactionToast
           type={error ? 'error' : 'success'}
           message={error || 'Transaction confirmed ⭐'}
-          txHash={lastTxHash}
+          txHash={lastTxHash || undefined}
           onClose={clearError}
         />
       )}

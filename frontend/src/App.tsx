@@ -10,17 +10,40 @@ import { Arbitrator } from './pages/Arbitrator';
 const App: React.FC = () => {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/employer" element={<Employer />} />
-          <Route path="/candidate" element={<Candidate />} />
-          <Route path="/arbitrator" element={<Arbitrator />} />
-          {/* Catch-all: return to role selection */}
-          <Route path="*" element={<Dashboard />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Landing page is full bleed, no sidebar */}
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+
+        {/* Protected workspace routes with Layout */}
+        <Route 
+          path="/employer" 
+          element={
+            <Layout>
+              <Employer />
+            </Layout>
+          } 
+        />
+        <Route 
+          path="/candidate" 
+          element={
+            <Layout>
+              <Candidate />
+            </Layout>
+          } 
+        />
+        <Route 
+          path="/arbitrator" 
+          element={
+            <Layout>
+              <Arbitrator />
+            </Layout>
+          } 
+        />
+
+        {/* Catch-all: return home */}
+        <Route path="*" element={<Dashboard />} />
+      </Routes>
     </Router>
   );
 };

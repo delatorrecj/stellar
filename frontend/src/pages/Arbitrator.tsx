@@ -234,11 +234,11 @@ export const Arbitrator: React.FC = () => {
         </div>
       )}
 
-      {lastTxHash && (
+      {(error || lastTxHash) && (
         <TransactionToast
           type={error ? 'error' : 'success'}
           message={error || 'Dispute Resolved Successfully ⭐'}
-          txHash={lastTxHash}
+          txHash={lastTxHash || undefined}
           onClose={clearError}
         />
       )}

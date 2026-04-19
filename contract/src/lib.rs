@@ -27,7 +27,7 @@
 mod events;
 mod types;
 
-use soroban_sdk::{contract, contractimpl, token, Address, Env, Vec};
+use soroban_sdk::{contract, contractimpl, token, Address, Env, String, Vec};
 
 use crate::events::{
     emit_candidate_accepted, emit_clawback, emit_dispute_raised, emit_dispute_resolved,
@@ -94,25 +94,35 @@ impl StellaContract {
         candidate: Address,
         token: Address,
         arbitrator: Address,
-        milestones: Vec<Milestone>,
+        descriptions: Vec<String>,
+        amounts: Vec<i128>,
         deadline: u64,
     ) -> Result<(), StellaError> {
         // STEP 1: Auth — employer must sign this transaction
         employer.require_auth();
 
-        // STEP 2: Validate milestones array is non-empty
-        if milestones.is_empty() {
+        if descriptions.len() != amounts.len() || descriptions.is_empty() {
             return Err(StellaError::EmptyMilestones);
         }
 
-        // STEP 3: Validate all milestone amounts > 0 and compute total
+        let mut milestones = Vec::new(&env);
         let mut total: i128 = 0;
-        for i in 0..milestones.len() {
-            let ms = milestones.get(i).unwrap();
-            if ms.amount <= 0 {
+
+        for i in 0..descriptions.len() {
+            let desc = descriptions.get_unchecked(i);
+            let amt = amounts.get_unchecked(i);
+            
+            if amt <= 0 {
                 return Err(StellaError::InvalidAmount);
             }
-            total = total.checked_add(ms.amount).expect("arithmetic overflow");
+
+            milestones.push_back(Milestone {
+                id: i as u32,
+                description: desc,
+                amount: amt,
+                released: false,
+            });
+            total = total.checked_add(amt).expect("arithmetic overflow");
         }
 
         // STEP 4: Check for existing active escrow

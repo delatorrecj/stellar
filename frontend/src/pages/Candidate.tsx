@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Target, Check, Clock, Shield, CheckCircle2, AlertTriangle, Gavel } from 'lucide-react';
+import { Target, Check, Clock, Shield, CheckCircle2, AlertTriangle, Gavel, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEscrow } from '../hooks/useEscrow';
 import { useStellar } from '../hooks/useStellar';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { TransactionToast } from '../components/TransactionToast';
+import ActivityLedger from '../components/ActivityLedger';
 
 /**
  * Candidate Workspace — V1.3 Multi-Milestone
@@ -86,10 +87,22 @@ export const Candidate: React.FC = () => {
       {/* Welcome header */}
       <header>
         <p className="text-xs font-semibold text-accent-600 mb-1">Welcome back</p>
-        <h1 className="text-2xl font-extrabold text-neutral-900 tracking-tight mb-1">
-          Candidate Workspace
-        </h1>
-        <p className="text-sm text-neutral-400 font-mono">{truncatedAddress}</p>
+        <div className="flex justify-between items-end">
+          <div>
+            <h1 className="text-2xl font-extrabold text-neutral-900 tracking-tight mb-1">
+              Candidate Workspace
+            </h1>
+            <p className="text-sm text-neutral-400 font-mono">{truncatedAddress}</p>
+          </div>
+          <button 
+            onClick={() => fetchEscrow()} 
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-neutral-500 hover:text-primary-600 hover:bg-white rounded-lg border border-transparent hover:border-neutral-200 transition-all"
+          >
+            <RotateCcw size={14} className={loading ? 'animate-spin' : ''} />
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 gap-6">
@@ -323,14 +336,19 @@ export const Candidate: React.FC = () => {
               </p>
             </div>
           )}
+          
+          {/* Activity Ledger Section */}
+          <div className="mt-8">
+            <ActivityLedger address={address} />
+          </div>
         </div>
       </div>
 
-      {lastTxHash && (
+      {(error || lastTxHash) && (
         <TransactionToast
           type={error ? 'error' : 'success'}
           message={error || 'Transaction confirmed ⭐'}
-          txHash={lastTxHash}
+          txHash={lastTxHash || undefined}
           onClose={clearError}
         />
       )}

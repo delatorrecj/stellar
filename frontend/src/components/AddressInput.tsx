@@ -28,11 +28,18 @@ export const AddressInput: React.FC<AddressInputProps> = ({
     }
 
     try {
-      if (StrKey.isValidEd25519PublicKey(value)) {
+      const isStrKey = StrKey.isValidEd25519PublicKey(value);
+      const isCorrectLength = value.length === 56;
+      
+      if (isStrKey && isCorrectLength) {
         setError(null);
         setIsValid(true);
       } else {
-        setError('Invalid Stellar address format');
+        if (value.length > 0 && value.length < 56) {
+          setError(`Address too short (${value.length}/56)`);
+        } else {
+          setError('Invalid Stellar address format');
+        }
         setIsValid(false);
       }
     } catch {

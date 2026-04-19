@@ -4,7 +4,8 @@ import {
   ArrowLeft,
   Menu,
   X,
-  Gavel
+  Gavel,
+  RefreshCw
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStellar } from '../hooks/useStellar';
@@ -23,11 +24,12 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { address } = useStellar();
+    const { address, balance, isSyncing, refreshBalance, connect } = useStellar();
   const { role, reset } = useOnboarding();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   const truncatedAddress = address ? `${address.slice(0, 4)}...${address.slice(-4)}` : null;
+  const formattedBalance = balance ? `${Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} XLM` : '0.00 XLM';
 
   const handleSwitchRole = () => {
     reset();
@@ -35,102 +37,107 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsMobileMenuOpen(false);
   };
 
-  // ── Pre-onboarding: Landing Page (Full bleed) ──
-  if (location.pathname === '/') {
-    return (
-      <div className="antialiased text-neutral-600 bg-neutral-50 min-h-screen">
-        <header className="absolute top-0 left-0 right-0 z-50 h-20 w-full flex justify-center">
-          <div className="max-w-7xl w-full h-full flex items-center justify-between px-6 lg:px-8">
-            <Link to="/" className="flex items-center gap-2 no-underline">
-              <img src="/S.svg" className="w-8 h-8" alt="Stella" />
-              <span className="text-xl font-bold tracking-tight text-neutral-900">Stella</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <a href="#cta-section" onClick={(e) => { e.preventDefault(); document.getElementById('cta-section')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-sm font-semibold text-neutral-600 hover:text-primary-600 transition-colors">
-                Sign Up
-              </a>
-            </div>
-          </div>
-        </header>
-        <main>
-          {children}
-        </main>
-      </div>
-    );
-  }
+  const handleReconnect = async () => {
+    await connect();
+    await refreshBalance();
+  };
 
-  // ── Pre-onboarding: Onboarding Flow (Minimal chrome) ──
-  if (location.pathname === '/onboarding') {
-    return (
-      <div className="min-h-screen bg-neutral-50 antialiased text-neutral-600">
-        <header className="h-16 flex items-center justify-center px-5">
-          <Link to="/" className="flex items-center gap-2 no-underline">
-            <img src="/S.svg" className="w-6 h-6" alt="Stella" />
-            <span className="text-lg font-bold tracking-tight text-neutral-900">Stella</span>
-          </Link>
-        </header>
-        <main className="px-4 pb-12">
-          {children}
-        </main>
-      </div>
-    );
-  }
-
-  // ── Post-onboarding: Workspace chrome ──
+  // ── Workspace chrome ──
   return (
-    <div className="flex h-screen bg-neutral-50 antialiased text-neutral-600 overflow-hidden">
+    <div className="flex h-screen bg-neutral-100 antialiased text-neutral-600 overflow-hidden">
       {/* Sidebar — Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-neutral-200 p-5 z-50">
+      <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-neutral-200 p-6 z-50">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 px-2 mb-8 no-underline">
-          <img src="/S.svg" className="w-6 h-6" alt="Stella" />
-          <span className="text-lg font-bold tracking-tight text-neutral-900">Stella</span>
+        <Link to="/" className="flex items-center gap-2 mb-10 no-underline">
+          <img src="/S.svg" className="w-7 h-7" alt="Stella" />
+          <span className="text-xl font-bold tracking-tight text-neutral-900">Stella</span>
         </Link>
 
-        {/* Role badge */}
-        <div className="px-3 py-2 bg-primary-50 rounded-xl mb-6">
-          <p className="text-xs font-bold text-primary-600 uppercase tracking-wider">
-            {role === 'employer' ? '👥 Employer Mode' : '✓ Candidate Mode'}
+        {/* Balance Card (Premium) */}
+        <div className="mb-8 p-4 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-2xl shadow-lg shadow-neutral-200 relative overflow-hidden">
+          {isSyncing && (
+            <div className="absolute top-0 right-0 p-2">
+              <RefreshCw size={12} className="text-primary-400 animate-spin" />
+            </div>
+          )}
+          <p className="text-[10px] uppercase tracking-widest font-bold text-neutral-400 mb-1">Available Balance</p>
+          <p className="text-2xl font-bold text-white tracking-tight leading-none mb-1">
+            {formattedBalance.split(' ')[0]}
+            <span className="text-sm ml-1 text-neutral-400 font-medium">XLM</span>
           </p>
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className={`w-1.5 h-1.5 rounded-full ${isSyncing ? 'bg-amber-400' : 'bg-success animate-pulse'}`} />
+            <span className={`text-[10px] font-bold uppercase tracking-wider ${isSyncing ? 'text-amber-400' : 'text-success'}`}>
+              {isSyncing ? 'Syncing...' : 'Live Wallet'}
+            </span>
+          </div>
         </div>
 
-        {/* Global Nav */}
-        <nav className="flex flex-col gap-1">
-          <Link
-            to="/arbitrator"
-            className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all"
-          >
-            <Gavel size={16} />
-            Arbitration Center
-          </Link>
-        </nav>
-
-        {/* Spacer */}
-        <div className="flex-1" />
+        {/* Navigation */}
+        <div className="space-y-6 flex-1">
+          <div>
+            <p className="px-3 text-[10px] uppercase tracking-widest font-bold text-neutral-400 mb-3">Workspace</p>
+            <nav className="flex flex-col gap-1.5">
+              <Link
+                to={`/${role}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+                  location.pathname === `/${role}`
+                  ? 'bg-primary-50 text-primary-700 border-primary-100'
+                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 border-transparent'
+                }`}
+              >
+                <span className="text-sm font-bold truncate">
+                  {role === 'employer' ? '👥 Employer Mode' : '✓ Candidate Mode'}
+                </span>
+              </Link>
+              <Link
+                to="/arbitrator"
+                className={`flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-all ${
+                  location.pathname === '/arbitrator' 
+                  ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' 
+                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
+                }`}
+              >
+                <Gavel size={18} />
+                Arbitration Center
+              </Link>
+            </nav>
+          </div>
+        </div>
 
         {/* Sidebar footer */}
-        <div className="flex flex-col gap-3 pt-4 border-t border-neutral-100">
-          {/* Network */}
-          <div className="flex items-center gap-2 px-2">
-            <span className="w-2 h-2 rounded-full bg-success shrink-0" />
-            <span className="text-xs font-semibold text-neutral-400">Stellar Testnet</span>
-          </div>
-
+        <div className="pt-6 border-t border-neutral-100 space-y-4">
           {/* Connected wallet */}
           {truncatedAddress && (
-            <div className="px-2">
-              <p className="text-xs text-neutral-400 mb-0.5">Connected</p>
-              <p className="text-sm font-mono font-semibold text-neutral-700">{truncatedAddress}</p>
+            <div className="px-4 py-3 bg-neutral-50 rounded-xl border border-neutral-100 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-neutral-400 mb-1">Account</p>
+                <p className="text-sm font-mono font-bold text-neutral-700">{truncatedAddress}</p>
+              </div>
+              <button 
+                onClick={handleReconnect}
+                className="p-1.5 text-neutral-400 hover:text-primary-600 hover:bg-white rounded-lg transition-all"
+                title="Refresh Wallet Sync"
+              >
+                <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
+              </button>
             </div>
           )}
 
-          {/* Switch role */}
+          {/* Network indicator */}
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-success" />
+              <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-tighter">Stellar Testnet</span>
+            </div>
+          </div>
+
           <button
             onClick={handleSwitchRole}
-            className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-neutral-400 hover:text-neutral-700 hover:bg-neutral-50 rounded-xl transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-neutral-500 hover:text-error hover:bg-error/5 rounded-xl transition-all border border-transparent hover:border-error/10"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Switch Role
+            <LogOut className="w-4 h-4" />
+            Exit Workspace
           </button>
         </div>
       </aside>
@@ -138,37 +145,41 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="h-14 bg-white border-b border-neutral-200 flex items-center justify-between px-5 z-40 shrink-0">
+        <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-6 lg:px-8 z-40 shrink-0">
           {/* Mobile: logo + role */}
-          <div className="lg:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-3">
             <img src="/S.svg" className="w-6 h-6" alt="Stella" />
-            <span className="text-sm font-bold tracking-tight text-neutral-900">Stella</span>
-            <span className="text-xs font-semibold text-primary-500 ml-1">
-              {role === 'employer' ? 'Employer' : 'Candidate'}
-            </span>
-          </div>
-
-          {/* Desktop: network + wallet */}
-          <div className="hidden lg:flex items-center gap-2 text-neutral-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-success" />
-            <span className="text-xs font-semibold">Stellar Testnet</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Desktop: wallet address */}
-            {truncatedAddress && (
-              <span className="hidden lg:inline text-xs font-mono text-neutral-500 bg-neutral-50 px-3 py-1.5 rounded-lg">
-                {truncatedAddress}
+            <div className="flex flex-col">
+              <span className="text-sm font-bold tracking-tight text-neutral-900 leading-none">Stella</span>
+              <span className="text-[10px] font-bold text-primary-600 uppercase tracking-wider">
+                {role === 'employer' ? 'Employer' : 'Candidate'}
               </span>
+            </div>
+          </div>
+
+          {/* Desktop Heading (Active Tab Name) */}
+          <div className="hidden lg:block">
+            <h1 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
+              Dashboard / <span className="text-neutral-900">{location.pathname === '/' ? 'Home' : location.pathname.slice(1).charAt(0).toUpperCase() + location.pathname.slice(2)}</span>
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Header Balance (Desktop) */}
+            {address && (
+              <div className="hidden sm:flex items-center gap-2 bg-neutral-50 px-3 py-1.5 rounded-full border border-neutral-100">
+                <span className="w-1.5 h-1.5 rounded-full bg-success" />
+                <span className="text-xs font-bold text-neutral-700">{formattedBalance}</span>
+              </div>
             )}
 
             {/* Mobile menu trigger */}
             <button
-              className="lg:hidden p-2 -mr-2 text-neutral-700 hover:bg-neutral-50 rounded-lg"
+              className="lg:hidden p-2 -mr-2 text-neutral-900 hover:bg-neutral-100 rounded-xl transition-colors"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open menu"
             >
-              <Menu size={20} />
+              <Menu size={22} />
             </button>
           </div>
         </header>
@@ -202,11 +213,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
 
             {/* Role badge */}
-            <div className="px-3 py-2 bg-primary-50 rounded-xl mb-6">
-              <p className="text-xs font-bold text-primary-600 uppercase tracking-wider">
+            <Link 
+              to={`/${role}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`block px-3 py-3 rounded-xl mb-6 border transition-all ${
+                location.pathname === `/${role}`
+                ? 'bg-primary-50 border-primary-100 text-primary-700'
+                : 'bg-neutral-50 border-neutral-100 text-neutral-500'
+              }`}
+            >
+              <p className="text-xs font-bold uppercase tracking-wider">
                 {role === 'employer' ? '👥 Employer Mode' : '✓ Candidate Mode'}
               </p>
-            </div>
+            </Link>
 
             <nav className="mb-6">
               <Link

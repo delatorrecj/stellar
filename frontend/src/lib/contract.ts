@@ -15,7 +15,6 @@ import {
   TransactionBuilder, 
   Account,
   Keypair,
-  xdr,
 } from '@stellar/stellar-sdk';
 import { NETWORK_DETAILS, CONTRACT_ID } from './stellar';
 import { getServer } from './rpc';
@@ -73,15 +72,40 @@ const CONTRACT_ERRORS: Record<number, string> = {
 
 export const parseContractError = (error: unknown): string => {
   const msg = String(error);
-  const match = msg.match(/Error\(Contract, #(\d+)\)/);
-  if (match) {
-    const code = parseInt(match[1]);
+  
+  // Try to find contract error code: HostError, Error(Contract, #123), etc.
+  const codeMatch = msg.match(/Contract,\s*(?:Error:)?\s*#(\d+)/i) || msg.match(/Error\(Contract, #(\d+)\)/);
+  
+  if (codeMatch) {
+    const code = parseInt(codeMatch[1]);
     return CONTRACT_ERRORS[code] ?? `Contract error #${code}`;
   }
-  if (msg.includes('insufficient balance')) return 'Insufficient XLM balance in wallet.';
-  if (msg.includes('timeout')) return 'Transaction timed out. Please try again.';
-  if (msg.includes('User declined') || msg.includes('user_declined')) return 'Transaction cancelled. You can try again.';
-  return 'Transaction failed. Check your wallet and try again.';
+
+  // Common Soroban/Stellar errors
+  if (msg.includes('insufficient balance')) return 'Insufficient XLM balance for this transaction.';
+  if (msg.includes('already exists')) return 'An escrow already exists for this candidate.';
+  if (msg.includes('timeout') || msg.includes('Deadline')) return 'Transaction timed out. Please try again.';
+  if (msg.includes('User declined') || msg.includes('user_declined') || msg.includes('cancelled')) {
+    return 'Transaction cancelled by user.';
+  }
+  
+  // Simulation failures often contain the reason
+  if (msg.includes('Simulation failed')) {
+    if (msg.includes('13')) return 'Escrow already exists for this candidate.';
+    if (msg.includes('insufficient')) return 'Simulation failed: Insufficient wallet balance for this amount.';
+    
+    // Extract everything after 'Simulation failed:'
+    const part = msg.split('Simulation failed')[1]?.trim() || '';
+    return `Simulation failed: ${part.slice(0, 120)}${part.length > 120 ? '...' : ''}`;
+  }
+
+  // Handle case where error might be an object with detailed fields
+  if (typeof error === 'object' && error !== null) {
+     const e = error as any;
+     if (e.status === 'ERROR' && e.error) return `Submission Error: ${e.error}`;
+  }
+
+  return `Transaction failed: ${msg.slice(0, 100)}${msg.length > 100 ? '...' : ''}`;
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────
@@ -220,33 +244,28 @@ export const StellaClient = {
   ) {
     if (!CONTRACT_ID) throw new Error('Contract ID not configured');
 
-    const deadline = Math.floor(Date.now() / 1000) + (deadlineDays * 24 * 60 * 60);
-
-    // Build milestone ScVal array
-    const milestoneVals = milestones.map((m, i) =>
-      xdr.ScVal.scvMap([
-        new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol('amount'), val: nativeToScVal(xlmToStroops(m.amount), { type: 'i128' }) }),
-        new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol('description'), val: nativeToScVal(m.description, { type: 'string' }) }),
-        new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol('id'), val: nativeToScVal(i, { type: 'u32' }) }),
-        new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol('released'), val: nativeToScVal(false, { type: 'bool' }) }),
-      ])
-    );
-    const milestonesScVal = xdr.ScVal.scvVec(milestoneVals);
+    const deadlineSeconds = Math.floor(Date.now() / 1000) + (deadlineDays * 24 * 60 * 60);
 
     const contract = new Contract(CONTRACT_ID);
     const txBuilder = await getBuilder(employer);
 
+    // 1. Prepare Arguments
+    const descriptions = milestones.map(m => m.description);
+    const amounts = milestones.map(m => xlmToStroops(m.amount));
+
+    const args = [
+      nativeToScVal(employer, { type: 'address' }),
+      nativeToScVal(candidate, { type: 'address' }),
+      nativeToScVal(tokenAddress, { type: 'address' }),
+      nativeToScVal(arbitrator, { type: 'address' }),
+      nativeToScVal(descriptions),
+      nativeToScVal(amounts),
+      nativeToScVal(BigInt(deadlineSeconds), { type: 'u64' }),
+    ];
+ 
     const tx = txBuilder
       .addOperation(
-        contract.call(
-          'init_escrow',
-          nativeToScVal(employer, { type: 'address' }),
-          nativeToScVal(candidate, { type: 'address' }),
-          nativeToScVal(tokenAddress, { type: 'address' }),
-          nativeToScVal(arbitrator, { type: 'address' }),
-          milestonesScVal,
-          nativeToScVal(BigInt(deadline), { type: 'u64' })
-        )
+        contract.call('init_escrow', ...args)
       )
       .build();
 

@@ -32,7 +32,7 @@ export const TransactionToast: React.FC<TransactionToastProps> = ({
   const networkExplorer = `https://stellar.expert/explorer/testnet/tx/${txHash}`;
 
   return (
-    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
+    <div className="fixed top-5 right-5 z-[100] w-full max-w-sm px-4 md:px-0">
       <div className="bg-neutral-900 text-white p-4 rounded-xl shadow-xl flex gap-3 items-start">
         {/* Icon */}
         <div className="mt-0.5 shrink-0">

@@ -3,7 +3,11 @@ import * as freighter from '@stellar/freighter-api';
 
 interface StellarContextType {
   address: string | null;
+  balance: string | null;
+  isSyncing: boolean;
+  network: string | null;
   connect: () => Promise<void>;
+  refreshBalance: () => Promise<void>;
   loading: boolean;
   error: string | null;
 }
@@ -14,8 +18,28 @@ export type { ReactNode };
 
 export const StellarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [address, setAddress] = useState<string | null>(null);
+  const [balance, setBalance] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [network, setNetwork] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const fetchBalance = async (addr: string) => {
+    setIsSyncing(true);
+    try {
+      const { getHorizonServer } = await import('../lib/rpc');
+      const server = await getHorizonServer();
+      const account = await server.loadAccount(addr);
+      const nativeBalance = account.balances.find((b: any) => b.asset_type === 'native');
+      if (nativeBalance) {
+        setBalance(nativeBalance.balance);
+      }
+    } catch (e) {
+      console.error('Failed to fetch balance:', e);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const connect = async () => {
     setLoading(true);
@@ -30,12 +54,21 @@ export const StellarProvider: React.FC<{ children: ReactNode }> = ({ children })
       if (result.error) {
           throw new Error(result.error);
       }
+      
+      const net = await freighter.getNetwork();
+      const networkName = typeof net === 'string' ? net : (net as any)?.network || 'UNKNOWN';
+      setNetwork(networkName.toUpperCase());
       setAddress(result.address);
+      if (result.address) fetchBalance(result.address);
     } catch (err: any) {
       setError(err.message || 'Failed to connect wallet');
     } finally {
       setLoading(false);
     }
+  };
+
+  const refreshBalance = async () => {
+    if (address) await fetchBalance(address);
   };
 
   useEffect(() => {
@@ -44,7 +77,10 @@ export const StellarProvider: React.FC<{ children: ReactNode }> = ({ children })
        if (isConnected) {
            try {
                const result = await freighter.getAddress();
-               if (result.address) setAddress(result.address);
+               if (result.address) {
+                 setAddress(result.address);
+                 fetchBalance(result.address);
+               }
            } catch (e) {
                // ignore auto-connect failures
            }
@@ -54,7 +90,7 @@ export const StellarProvider: React.FC<{ children: ReactNode }> = ({ children })
   }, []);
 
   return (
-    <StellarContext.Provider value={{ address, connect, loading, error }}>
+    <StellarContext.Provider value={{ address, balance, isSyncing, network, connect, refreshBalance, loading, error }}>
       {children}
     </StellarContext.Provider>
   );
