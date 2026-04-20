@@ -30,13 +30,13 @@ export default defineConfig({
         theme_color: "#1A65E0",
         icons: [
           {
-            src: "/favicon.svg",
+            src: "/S.svg",
             sizes: "any",
             type: "image/svg+xml",
             purpose: "any maskable"
           },
           {
-            src: "/favicon-32.svg",
+            src: "/S.svg",
             sizes: "32x32",
             type: "image/svg+xml"
           }
