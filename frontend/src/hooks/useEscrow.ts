@@ -151,7 +151,8 @@ export const useEscrow = (): UseEscrowReturn => {
       }
       setEscrow(null);
       return null;
-    } catch {
+    } catch (err) {
+      console.error("Error in fetchLatestCandidateEscrow:", err);
       setEscrow(null);
       return null;
     } finally {

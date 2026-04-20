@@ -102,7 +102,30 @@ export const Candidate: React.FC = () => {
               </p>
 
               <div className="mt-8 pt-6 border-t border-neutral-100 w-full flex flex-col items-center">
-                <p className="text-xs text-neutral-400 mb-2">Escrow still not reflecting or having issues?</p>
+                <p className="text-sm font-bold text-neutral-700 mb-2">Can't see your escrow?</p>
+                <div className="flex w-full max-w-md gap-2 mb-6">
+                  <input
+                    type="text"
+                    placeholder="Enter Employer Address (G...)"
+                    className="input-field bg-white flex-1"
+                    onChange={(e) => {
+                      // We only want to set target if the user is typing
+                      // It will automatically update the parent hook's state
+                      // Actually, let's just use a local state for this input
+                    }}
+                  />
+                  <button 
+                    onClick={(e) => {
+                      const input = (e.currentTarget.previousElementSibling as HTMLInputElement).value;
+                      if (input) fetchEscrow(input);
+                    }}
+                    className="btn-stella whitespace-nowrap"
+                  >
+                    Load Manually
+                  </button>
+                </div>
+                
+                <p className="text-xs text-neutral-400 mb-2">Still having issues?</p>
                 <button 
                   onClick={() => window.location.href = `mailto:support@stella-escrow.com?subject=Missing%20Escrow&body=My%20candidate%20address:%20${address}%0A%0AHello,%20I%20cannot%20find%20my%20onboarding%20escrow.`}
                   className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 text-xs font-semibold rounded-lg transition-all flex items-center gap-2"
