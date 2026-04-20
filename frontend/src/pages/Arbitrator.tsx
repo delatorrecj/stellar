@@ -17,16 +17,17 @@ export const Arbitrator: React.FC = () => {
   const { fetchEscrow, escrow, resolveDispute, isTxPending, error, lastTxHash, clearError, loading } = useEscrow();
   
   const [candidateSearch, setCandidateSearch] = useState('');
+  const [employerSearch, setEmployerSearch] = useState('');
   const [candidateBps, setCandidateBps] = useState(5000); // Default 50/50 split
 
   const handleSearch = () => {
-    if (candidateSearch) fetchEscrow(candidateSearch);
+    if (candidateSearch && employerSearch) fetchEscrow(employerSearch, candidateSearch);
   };
 
   const handleResolve = async () => {
     if (!escrow) return;
     try {
-      await resolveDispute(candidateSearch, candidateBps);
+      await resolveDispute(escrow.employer, escrow.candidate, candidateBps);
     } catch (err) {
       console.error(err);
     }
@@ -45,7 +46,7 @@ export const Arbitrator: React.FC = () => {
           Dispute Resolution Dashboard
         </h1>
         <p className="text-sm text-neutral-500 max-w-2xl">
-          Search for candidate addresses to review and resolve formal disputes on the Stella network.
+          Search for the employer and candidate addresses to review and resolve formal disputes on the Stella network.
         </p>
       </header>
 
@@ -53,9 +54,16 @@ export const Arbitrator: React.FC = () => {
       <div className="card-stella p-6 border-indigo-100 flex flex-col gap-4">
         <label className="label-section flex items-center gap-2">
           <Search size={14} />
-          Lookup Candidate Escrow
+          Lookup Escrow
         </label>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex-1">
+            <AddressInput
+              value={employerSearch}
+              onChange={(val) => setEmployerSearch(val)}
+              placeholder="Employer Public Key (G...)"
+            />
+          </div>
           <div className="flex-1">
             <AddressInput
               value={candidateSearch}
@@ -65,7 +73,7 @@ export const Arbitrator: React.FC = () => {
           </div>
           <button
             onClick={handleSearch}
-            disabled={loading || !candidateSearch}
+            disabled={loading || !candidateSearch || !employerSearch}
             className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold rounded-xl transition-all"
           >
             {loading ? 'Searching...' : 'Search'}

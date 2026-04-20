@@ -103,7 +103,7 @@ stella/
 | `resolve_dispute`  | Final fund split by trusted third-party       | Arbitrator Only |
 | `get_escrow`       | Fetches on-chain state & progress             | Public          |
 
-**Contract ID:** `CDA67YOAWOOMMSIW44IOQWDSB2P6PGG3PRH3WPFEFCM5BO3LGF7POHZL`
+**Contract ID:** `CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH`
 **Network:** Stellar Testnet (V22)
 **Asset:** Native XLM (`CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`)
 

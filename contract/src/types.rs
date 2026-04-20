@@ -13,9 +13,12 @@ use soroban_sdk::{contracttype, contracterror, Address, String, Vec};
 #[contracttype]
 #[derive(Clone)]
 pub enum DataKey {
-    /// Stores an Escrow struct for a specific candidate.
-    /// Supports multiple escrows per contract instance (one per candidate).
-    Escrow(Address),
+    /// Stores an Escrow struct for a specific employer-candidate pair.
+    /// Format: (Employer Address, Candidate Address)
+    Escrow(Address, Address),
+
+    /// Tracks all employer addresses that have created an escrow for this candidate.
+    CandidateEscrows(Address),
 
     /// The admin address — set once during initialize().
     /// Stored in instance storage (lives as long as contract).

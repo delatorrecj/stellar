@@ -1,10 +1,10 @@
 # 🚀 Stella — Context & Battle Plan
 
-> **Last Updated:** 2026-04-19 12:45 PHT  
-> **Status:** 🟣 V1.3 Multi-Milestone Ready — Full State Machine, Milestone Logic, Hardened TTL & Authorization  
+> **Last Updated:** 2026-04-20 14:00 PHT  
+> **Status:** 🟣 V1.4 Composite-Key Ready — Multi-Employer support, Fixed Delivery Flow, Synchronized Token Logic  
 > **Product:** Stella — Soroban-powered pre-employment onboarding escrow  
 > **Event:** Stellar Bootcamp (Offline) — Whitecloak Office, Ortigas, Manila  
-> **Date:** April 19, 2026 | Day 2 of Finalization  
+> **Date:** April 20, 2026 | Post-V1.3 Optimization  
 > **Track:** Prize Pool ($100–$200) — Full-stack dApp (contract + frontend + Freighter)
 
 ---
@@ -54,7 +54,7 @@ A **4-hour hands-on session** (expanded to Day 2 for Phase V1.3) where you:
 - ✅ Completed contract code (Architectural single-chain limitations resolved)
 - ✅ `cargo test` with 19+ passing tests
 - ✅ Contract deployed to Stellar testnet
-- ✅ Contract ID `CDA67YOAWOOMMSIW44IOQWDSB2P6PGG3PRH3WPFEFCM5BO3LGF7POHZL`
+- ✅ Contract ID `CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH`
 
 ### 🏆 Track 2: Prize Pool (Completed ✅)
 > Build a **full-stack project** (frontend + smart contract + integration)
@@ -75,34 +75,38 @@ stella/
 ├── CONTEXT.md               # Tracker mapped
 ├── ITERATE.md               # Sprint log & execution notes ✅
 ├── README.md                # Production documentation ✅
-├── contract/                # ✅ Soroban smart contract (V1.3)
+├── contract/                # ✅ Soroban smart contract (V1.4)
 │   ├── Cargo.toml
 │   └── src/
-│       ├── lib.rs           # Core multi-milestone logic ✅
-│       ├── types.rs         # Milestone structs, EscrowState, StellaError ✅
+│       ├── lib.rs           # Core logic: Now uses Composite Keys (Employer, Candidate) ✅
+│       ├── types.rs         # DataKey updated for multi-employer support ✅
 │       ├── events.rs        # Event emission helpers ✅
 │       └── test.rs          # 19 passing unit tests (100% coverage) ✅
-└── frontend/                # ✅ React + Vite + TypeScript (V1.3 Ready)
+└── frontend/                # ✅ React + Vite + TypeScript (V1.4 Ready)
     ├── vite.config.ts       # PWA Configuration Refined
     ├── src/
     │   ├── pages/           # Employer.tsx (MilestoneBuilder), Candidate.tsx (Progress)
     │   ├── hooks/           # useEscrow (Dispute Guards & Polling)
-    │   └── lib/             # Contract Client & RPC Node Pool
+    │   └── lib/             # Contract Client Updated for composite key lookups ✅
     └── init_contract.mjs    # Automation script for one-time initialization
 ```
 
 ---
 
-## Session Log (April 19 - V1.3 Rewrite)
+## Session Log (April 19-20)
 
-| Time | Event | Status |
-|------|-------|--------|
-| 09:30 | CONTRACT: Rewrote `types.rs` for `Vec<Milestone>` & Enums | ✅ |
-| 10:15 | CONTRACT: Implemented state-machine transitions in `lib.rs` | ✅ |
-| 11:00 | CONTRACT: Expanded test suite to 19 tests (all passing) | ✅ |
-| 11:45 | DEPLOYMENT: Build & Deploy V1.3 WASM to testnet | ✅ `CDA67...7POHZL` |
-| 12:05 | FRONTEND: Hook `useEscrow` updated with transaction polling | ✅ |
-| 12:15 | FRONTEND: MilestoneBuilder implemented in Employer page | ✅ |
-| 12:30 | SCRIPT: One-time contract initialization script created | ✅ |
-| 12:45 | DOCS: README, ITERATE, and CONTEXT refreshed | ✅ |
-| 13:00 | FINAL POLISH: PWA manifest and mobile responsiveness check | ✅ |
+| Date | Time | Event | Status |
+|------|------|-------|--------|
+| Apr 19 | 09:30 | CONTRACT: Rewrote `types.rs` for `Vec<Milestone>` & Enums | ✅ |
+| Apr 19 | 10:15 | CONTRACT: Implemented state-machine transitions in `lib.rs` | ✅ |
+| Apr 19 | 11:00 | CONTRACT: Expanded test suite to 19 tests (all passing) | ✅ |
+| Apr 19 | 11:45 | DEPLOYMENT: Build & Deploy V1.3 WASM to testnet | ✅ `CDA67...7POHZL` |
+| Apr 19 | 12:05 | FRONTEND: Hook `useEscrow` updated with transaction polling | ✅ |
+| Apr 19 | 12:15 | FRONTEND: MilestoneBuilder implemented in Employer page | ✅ |
+| Apr 19 | 12:30 | SCRIPT: One-time contract initialization script created | ✅ |
+| Apr 19 | 12:45 | DOCS: README, ITERATE, and CONTEXT refreshed | ✅ |
+| Apr 20 | 13:00 | INVESTIGATION: Root cause analysis of escrow visibility bug | ✅ |
+| Apr 20 | 13:30 | ARCHITECTURE: Migration to Composite Key `(Employer, Candidate)` | ✅ |
+| Apr 20 | 13:45 | CONTRACT: Updated `lib.rs` & `types.rs` for multi-employer support | ✅ |
+| Apr 20 | 14:00 | FRONTEND: Updated `contract.ts` for new API signatures | ✅ |
+| Apr 20 | 14:15 | DOCS: Rewrote PRD and cleaned up redundant build docs | ✅ |

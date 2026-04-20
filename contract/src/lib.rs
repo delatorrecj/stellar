@@ -92,7 +92,6 @@ impl StellaContract {
         env: Env,
         employer: Address,
         candidate: Address,
-        token: Address,
         arbitrator: Address,
         descriptions: Vec<String>,
         amounts: Vec<i128>,
@@ -100,6 +99,10 @@ impl StellaContract {
     ) -> Result<(), StellaError> {
         // STEP 1: Auth — employer must sign this transaction
         employer.require_auth();
+
+        // Fetch token from instance storage
+        let token = env.storage().instance().get::<DataKey, Address>(&DataKey::Token)
+            .ok_or(StellaError::NotInitialized)?;
 
         if descriptions.len() != amounts.len() || descriptions.is_empty() {
             return Err(StellaError::EmptyMilestones);
@@ -125,8 +128,8 @@ impl StellaContract {
             total = total.checked_add(amt).expect("arithmetic overflow");
         }
 
-        // STEP 4: Check for existing active escrow
-        let key = DataKey::Escrow(candidate.clone());
+        // STEP 4: Check for existing active escrow between THIS employer and THIS candidate
+        let key = DataKey::Escrow(employer.clone(), candidate.clone());
         if let Some(existing) = env.storage().persistent().get::<_, Escrow>(&key) {
             // Allow overwriting if the previous escrow is finished
             if existing.state == EscrowState::Pending || existing.state == EscrowState::Active {
@@ -151,11 +154,26 @@ impl StellaContract {
             .persistent()
             .extend_ttl(&key, MIN_TTL, MAX_TTL);
 
-        // STEP 7: Transfer total XLM from employer to contract
+        // STEP 7: Update candidate's employer list (reverse lookup)
+        let candidate_key = DataKey::CandidateEscrows(candidate.clone());
+        let mut candidate_employers: Vec<Address> = env
+            .storage()
+            .persistent()
+            .get(&candidate_key)
+            .unwrap_or_else(|| Vec::new(&env));
+        
+        // Prevent duplicate indexing if employer creates multiple (though UI handles 1:1 currently)
+        if !candidate_employers.contains(&employer) {
+            candidate_employers.push_back(employer.clone());
+            env.storage().persistent().set(&candidate_key, &candidate_employers);
+        }
+        env.storage().persistent().extend_ttl(&candidate_key, MIN_TTL, MAX_TTL);
+
+        // STEP 8: Transfer total XLM from employer to contract
         let token_client = token::Client::new(&env, &token);
         token_client.transfer(&employer, &env.current_contract_address(), &total);
 
-        // STEP 8: Emit event
+        // STEP 9: Emit event
         emit_escrow_created(&env, &employer, &candidate, total);
 
         Ok(())
@@ -172,13 +190,14 @@ impl StellaContract {
 
     pub fn candidate_accept(
         env: Env,
+        employer: Address,
         candidate: Address,
     ) -> Result<(), StellaError> {
         // STEP 1: Auth — candidate must sign
         candidate.require_auth();
 
         // STEP 2: Load escrow
-        let key = DataKey::Escrow(candidate.clone());
+        let key = DataKey::Escrow(employer, candidate.clone());
         let mut escrow: Escrow = env
             .storage()
             .persistent()
@@ -235,7 +254,7 @@ impl StellaContract {
         employer.require_auth();
 
         // STEP 2: Load escrow
-        let key = DataKey::Escrow(candidate.clone());
+        let key = DataKey::Escrow(employer.clone(), candidate.clone());
         let mut escrow: Escrow = env
             .storage()
             .persistent()
@@ -347,7 +366,7 @@ impl StellaContract {
         employer.require_auth();
 
         // STEP 2: Load escrow
-        let key = DataKey::Escrow(candidate.clone());
+        let key = DataKey::Escrow(employer.clone(), candidate.clone());
         let mut escrow: Escrow = env
             .storage()
             .persistent()
@@ -404,16 +423,16 @@ impl StellaContract {
     // Returns the escrow state for a given candidate.
     // No auth required — escrow data is public.
 
-    pub fn get_escrow(env: Env, candidate: Address) -> Result<Escrow, StellaError> {
-        let key = DataKey::Escrow(candidate);
+    pub fn get_escrow(env: Env, employer: Address, candidate: Address) -> Result<Escrow, StellaError> {
+        let key = DataKey::Escrow(employer, candidate);
         env.storage()
             .persistent()
             .get(&key)
             .ok_or(StellaError::EscrowNotFound)
     }
 
-    // ─── RAISE DISPUTE ───────────────────────────────────────────
-    // New in V2.0. Candidate raises a dispute if the employer ghosts
+    // ─── RAISE DISPUTE (V2.0) ──────────────────────────────────────
+    // Candidate raises a dispute if the employer ghosts
     // them or refuses to release milestones after the deadline.
     //
     // Auth:     candidate must sign
@@ -421,12 +440,12 @@ impl StellaContract {
     // State:    Active → Disputed
     // Event:    ("escrow", "disputed")
 
-    pub fn raise_dispute(env: Env, candidate: Address) -> Result<(), StellaError> {
+    pub fn raise_dispute(env: Env, employer: Address, candidate: Address) -> Result<(), StellaError> {
         // STEP 1: Auth — candidate must sign
         candidate.require_auth();
 
         // STEP 2: Load escrow
-        let key = DataKey::Escrow(candidate.clone());
+        let key = DataKey::Escrow(employer, candidate.clone());
         let mut escrow: Escrow = env
             .storage()
             .persistent()
@@ -463,12 +482,12 @@ impl StellaContract {
         Ok(())
     }
 
-    // ─── RESOLVE DISPUTE ─────────────────────────────────────────
-    // New in V2.0. Arbitrator resolves a dispute by splitting unreleased
+    // ─── RESOLVE DISPUTE (V2.0) ─────────────────────────────────────
+    // Arbitrator resolves a dispute by splitting unreleased
     // funds between the candidate and employer based on a percentage.
     //
     // Auth:     arbitrator must sign
-    // Checks:   state == Disputed, candidate_bps in 0..=10000
+    // checks: state == Disputed, candidate_bps in 0..=10000
     // Transfer: total_unreleased split based on bps
     // State:    Disputed → Resolved
     // Event:    ("escrow", "resolved")
@@ -476,14 +495,15 @@ impl StellaContract {
     pub fn resolve_dispute(
         env: Env,
         arbitrator: Address,
+        employer: Address,
         candidate_addr: Address,
         candidate_bps: u32,
     ) -> Result<(), StellaError> {
         // STEP 1: Auth — arbitrator must sign
         arbitrator.require_auth();
 
-        // STEP 2: Load escrow
-        let key = DataKey::Escrow(candidate_addr.clone());
+        // STEP 2: Load escrow {employer, candidate}
+        let key = DataKey::Escrow(employer, candidate_addr.clone());
         let mut escrow: Escrow = env
             .storage()
             .persistent()
@@ -567,6 +587,17 @@ impl StellaContract {
         emit_dispute_resolved(&env, &candidate_addr, candidate_payout, employer_payout);
 
         Ok(())
+    }
+
+    // ─── UTILITY READS ───────────────────────────────────────────
+
+    /// Returns a list of employer addresses that have created an escrow for this candidate.
+    pub fn get_candidate_escrows(env: Env, candidate: Address) -> Vec<Address> {
+        let key = DataKey::CandidateEscrows(candidate);
+        env.storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(&env))
     }
 }
 

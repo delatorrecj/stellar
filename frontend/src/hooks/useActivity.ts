@@ -30,7 +30,7 @@ export function useActivity(address: string | null) {
 
       const records = response.records.map(op => {
         // We try to identify contract calls or transfers related to Stella
-        let type = op.type;
+        let type: string = (op as any).type;
         if (op.type === 'invoke_host_function') {
           type = 'Contract Call';
         }

@@ -15,6 +15,7 @@ import {
   TransactionBuilder, 
   Account,
   Keypair,
+  xdr,
 } from '@stellar/stellar-sdk';
 import { NETWORK_DETAILS, CONTRACT_ID } from './stellar';
 import { getServer } from './rpc';
@@ -64,8 +65,8 @@ const CONTRACT_ERRORS: Record<number, string> = {
   10: 'Escrow must be in Active state for this action.',
   11: 'Escrow must be in Pending state for this action.',
   12: 'Candidate has already accepted this escrow.',
-  13: 'An active escrow already exists for this candidate.',
-  14: 'No escrow found for this candidate.',
+  13: 'An active escrow already exists between this employer and candidate.',
+  14: 'No escrow found for this employer-candidate pair.',
   15: 'Escrow must be in Disputed state.',
   16: 'Dispute percentage (BPS) must be between 0 and 10000.',
 };
@@ -83,7 +84,7 @@ export const parseContractError = (error: unknown): string => {
 
   // Common Soroban/Stellar errors
   if (msg.includes('insufficient balance')) return 'Insufficient XLM balance for this transaction.';
-  if (msg.includes('already exists')) return 'An escrow already exists for this candidate.';
+  if (msg.includes('already exists')) return 'An escrow already exists between this employer and candidate.';
   if (msg.includes('timeout') || msg.includes('Deadline')) return 'Transaction timed out. Please try again.';
   if (msg.includes('User declined') || msg.includes('user_declined') || msg.includes('cancelled')) {
     return 'Transaction cancelled by user.';
@@ -91,7 +92,7 @@ export const parseContractError = (error: unknown): string => {
   
   // Simulation failures often contain the reason
   if (msg.includes('Simulation failed')) {
-    if (msg.includes('13')) return 'Escrow already exists for this candidate.';
+    if (msg.includes('13')) return 'Escrow already exists between this employer and candidate.';
     if (msg.includes('insufficient')) return 'Simulation failed: Insufficient wallet balance for this amount.';
     
     // Extract everything after 'Simulation failed:'
@@ -126,7 +127,8 @@ function stroopsToXlm(stroops: bigint | number | string): string {
 
 function parseEscrowState(raw: unknown): EscrowState {
   if (typeof raw === 'string') return raw as EscrowState;
-  // Soroban returns enum as keyed object
+  if (Array.isArray(raw) && raw.length > 0) return raw[0] as EscrowState;
+  // Soroban returns enum as keyed object sometimes
   if (typeof raw === 'object' && raw !== null) {
     const keys = Object.keys(raw);
     if (keys.length > 0) return keys[0] as EscrowState;
@@ -203,9 +205,9 @@ async function simulateAndAssemble(
 
 export const StellaClient = {
   /**
-   * Read escrow for a candidate. Returns null if not found.
+   * Read escrow for a specific employer-candidate pair. Returns null if not found.
    */
-  async getEscrow(candidateAddress: string): Promise<EscrowData | null> {
+  async getEscrow(employerAddress: string, candidateAddress: string): Promise<EscrowData | null> {
     if (!CONTRACT_ID) throw new Error('Contract ID not configured');
 
     const server = await getServer();
@@ -216,7 +218,7 @@ export const StellaClient = {
         { fee: '100', networkPassphrase }
       )
         .addOperation(
-          contract.call('get_escrow', nativeToScVal(candidateAddress, { type: 'address' }))
+          contract.call('get_escrow', nativeToScVal(employerAddress, { type: 'address' }), nativeToScVal(candidateAddress, { type: 'address' }))
         )
         .setTimeout(30)
         .build()
@@ -231,13 +233,41 @@ export const StellaClient = {
   },
 
   /**
+   * Fetch all employers that have an escrow assigned to this candidate.
+   * Uses the new reverse lookup index in V1.3.
+   */
+  async getCandidateEmployers(candidateAddress: string): Promise<string[]> {
+    if (!CONTRACT_ID) throw new Error('Contract ID not configured');
+
+    const server = await getServer();
+    const contract = new Contract(CONTRACT_ID);
+    const result = await server.simulateTransaction(
+      new TransactionBuilder(
+        new Account(Keypair.random().publicKey(), '0'),
+        { fee: '100', networkPassphrase }
+      )
+        .addOperation(
+          contract.call('get_candidate_escrows', nativeToScVal(candidateAddress, { type: 'address' }))
+        )
+        .setTimeout(30)
+        .build()
+    );
+
+    if (rpc.Api.isSimulationSuccess(result)) {
+      const raw: any[] = scValToNative(result.result!.retval) || [];
+      return raw.map(addr => String(addr));
+    }
+
+    return [];
+  },
+
+  /**
    * Create an escrow with milestone array.
    * Returns an assembled, simulation-checked transaction ready for signing.
    */
   async createEscrowTx(
     employer: string,
     candidate: string,
-    tokenAddress: string,
     arbitrator: string,
     milestones: MilestoneInput[],
     deadlineDays: number
@@ -253,13 +283,18 @@ export const StellaClient = {
     const descriptions = milestones.map(m => m.description);
     const amounts = milestones.map(m => xlmToStroops(m.amount));
 
+    // Stellar SDK's nativeToScVal on an array downcasts sizes unpredictably (u64 mixed with i128)
+    // We MUST enforce strict ScVal types for Vec<i128> to match contract ABI
+    const scvAmounts = xdr.ScVal.scvVec(
+      amounts.map(amt => nativeToScVal(amt, { type: 'i128' }))
+    );
+
     const args = [
       nativeToScVal(employer, { type: 'address' }),
       nativeToScVal(candidate, { type: 'address' }),
-      nativeToScVal(tokenAddress, { type: 'address' }),
       nativeToScVal(arbitrator, { type: 'address' }),
       nativeToScVal(descriptions),
-      nativeToScVal(amounts),
+      scvAmounts,
       nativeToScVal(BigInt(deadlineSeconds), { type: 'u64' }),
     ];
  
@@ -275,7 +310,7 @@ export const StellaClient = {
   /**
    * Candidate accepts an escrow. Transitions Pending → Active.
    */
-  async candidateAcceptTx(candidate: string) {
+  async candidateAcceptTx(employer: string, candidate: string) {
     if (!CONTRACT_ID) throw new Error('Contract ID not configured');
 
     const contract = new Contract(CONTRACT_ID);
@@ -285,6 +320,7 @@ export const StellaClient = {
       .addOperation(
         contract.call(
           'candidate_accept',
+          nativeToScVal(employer, { type: 'address' }),
           nativeToScVal(candidate, { type: 'address' })
         )
       )
@@ -341,7 +377,7 @@ export const StellaClient = {
   /**
    * Candidate raises a dispute after deadline.
    */
-  async raiseDisputeTx(candidate: string) {
+  async raiseDisputeTx(employer: string, candidate: string) {
     if (!CONTRACT_ID) throw new Error('Contract ID not configured');
 
     const contract = new Contract(CONTRACT_ID);
@@ -351,6 +387,7 @@ export const StellaClient = {
       .addOperation(
         contract.call(
           'raise_dispute',
+          nativeToScVal(employer, { type: 'address' }),
           nativeToScVal(candidate, { type: 'address' })
         )
       )
@@ -362,7 +399,7 @@ export const StellaClient = {
   /**
    * Arbitrator resolves a dispute with a split.
    */
-  async resolveDisputeTx(arbitrator: string, candidate: string, candidateBps: number) {
+  async resolveDisputeTx(arbitrator: string, employer: string, candidate: string, candidateBps: number) {
     if (!CONTRACT_ID) throw new Error('Contract ID not configured');
 
     const contract = new Contract(CONTRACT_ID);
@@ -373,6 +410,7 @@ export const StellaClient = {
         contract.call(
           'resolve_dispute',
           nativeToScVal(arbitrator, { type: 'address' }),
+          nativeToScVal(employer, { type: 'address' }),
           nativeToScVal(candidate, { type: 'address' }),
           nativeToScVal(candidateBps, { type: 'u32' })
         )
