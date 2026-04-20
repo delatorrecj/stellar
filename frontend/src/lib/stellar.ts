@@ -8,7 +8,7 @@ export const NETWORK_DETAILS = {
   networkPassphrase: 'Test SDF Network ; September 2015',
 };
 
-export const CONTRACT_ID = import.meta.env.VITE_CONTRACT_ID;
+export const CONTRACT_ID = import.meta.env.VITE_CONTRACT_ID || 'CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH';
 
 if (!CONTRACT_ID) {
   console.warn('⚠️ Stella: VITE_CONTRACT_ID is not defined in .env');
