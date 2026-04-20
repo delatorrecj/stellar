@@ -41,7 +41,7 @@ export interface EscrowData {
   deadline: number;
   state: EscrowState;
   arbitrator: string;
-  totalLocked: string;   // sum of unreleased
+  totalLocked: string;   // sum of all milestones
   totalReleased: string; // sum of released
 }
 
@@ -114,7 +114,9 @@ export const parseContractError = (error: unknown): string => {
 const STROOPS_PER_XLM = 10_000_000n;
 
 function xlmToStroops(xlm: string): bigint {
-  return BigInt(Math.floor(parseFloat(xlm) * 10_000_000));
+  const [whole = '0', frac = ''] = xlm.split('.');
+  const paddedFrac = frac.padEnd(7, '0').slice(0, 7);
+  return BigInt(whole) * 10_000_000n + BigInt(paddedFrac);
 }
 
 function stroopsToXlm(stroops: bigint | number | string): string {
@@ -148,10 +150,9 @@ function parseEscrowData(raw: any): EscrowData {
   let totalReleased = 0n;
   for (const m of raw.milestones || []) {
     const amt = typeof m.amount === 'bigint' ? m.amount : BigInt(m.amount);
+    totalLocked += amt;
     if (m.released) {
       totalReleased += amt;
-    } else {
-      totalLocked += amt;
     }
   }
 

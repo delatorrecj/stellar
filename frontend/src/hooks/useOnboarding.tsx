@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 export type UserRole = 'employer' | 'candidate';
 
@@ -11,13 +11,9 @@ interface OnboardingState {
 
 const STORAGE_KEY = 'stella_role';
 
-/**
- * useOnboarding — manages the user's role selection and onboarding state.
- * 
- * Uses sessionStorage (resets on tab close) for privacy-first MVP.
- * isOnboarded = role is set + wallet is connected (checked by consumer).
- */
-export const useOnboarding = (): OnboardingState => {
+const OnboardingContext = createContext<OnboardingState | undefined>(undefined);
+
+export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRoleState] = useState<UserRole | null>(() => {
     try {
       return (sessionStorage.getItem(STORAGE_KEY) as UserRole) || null;
@@ -55,10 +51,25 @@ export const useOnboarding = (): OnboardingState => {
     return () => window.removeEventListener('storage', handler);
   }, []);
 
-  return {
-    role,
-    isOnboarded: role !== null, // Full onboarding = role + wallet (checked by pages)
-    setRole,
-    reset,
-  };
+  return (
+    <OnboardingContext.Provider value={{
+      role,
+      isOnboarded: role !== null, // Full onboarding = role + wallet (checked by pages)
+      setRole,
+      reset,
+    }}>
+      {children}
+    </OnboardingContext.Provider>
+  );
+};
+
+/**
+ * useOnboarding — manages the user's role selection and onboarding state.
+ */
+export const useOnboarding = (): OnboardingState => {
+  const context = useContext(OnboardingContext);
+  if (!context) {
+    throw new Error('useOnboarding must be used within an OnboardingProvider');
+  }
+  return context;
 };

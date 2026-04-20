@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getHorizonServer } from '../lib/rpc';
 
 export interface Activity {
@@ -15,7 +15,7 @@ export function useActivity(address: string | null) {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchActivity = async () => {
+  const fetchActivity = useCallback(async () => {
     if (!address) return;
     setIsLoading(true);
 
@@ -52,14 +52,14 @@ export function useActivity(address: string | null) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [address]);
 
   useEffect(() => {
     fetchActivity();
     // Refresh every 30s
     const interval = setInterval(fetchActivity, 30000);
     return () => clearInterval(interval);
-  }, [address]);
+  }, [fetchActivity]);
 
   return { activities, isLoading, refresh: fetchActivity };
 }

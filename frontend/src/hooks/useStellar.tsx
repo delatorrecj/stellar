@@ -57,7 +57,13 @@ export const StellarProvider: React.FC<{ children: ReactNode }> = ({ children })
       
       const net = await freighter.getNetwork();
       const networkName = typeof net === 'string' ? net : (net as any)?.network || 'UNKNOWN';
-      setNetwork(networkName.toUpperCase());
+      const upperNet = networkName.toUpperCase();
+      setNetwork(upperNet);
+      
+      if (upperNet !== 'TESTNET') {
+        throw new Error('Please switch Freighter to the TESTNET network');
+      }
+      
       setAddress(result.address);
       if (result.address) fetchBalance(result.address);
     } catch (err: any) {
@@ -78,11 +84,20 @@ export const StellarProvider: React.FC<{ children: ReactNode }> = ({ children })
            try {
                const result = await freighter.getAddress();
                if (result.address) {
+                 const net = await freighter.getNetwork();
+                 const networkName = typeof net === 'string' ? net : (net as any)?.network || 'UNKNOWN';
+                 const upperNet = networkName.toUpperCase();
+                 setNetwork(upperNet);
+                 
+                 if (upperNet !== 'TESTNET') {
+                   throw new Error('Please switch Freighter to the TESTNET network');
+                 }
+                 
                  setAddress(result.address);
                  fetchBalance(result.address);
                }
-           } catch (e) {
-               // ignore auto-connect failures
+           } catch (e: any) {
+               setError(e.message || 'Failed to connect');
            }
        }
     };

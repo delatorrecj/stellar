@@ -90,7 +90,7 @@ stella/
 └── README.md          ← You are here
 ```
 
-## Smart Contract (V1.3)
+## Smart Contract (V2.0)
 
 | Function           | Description                                   | Guard           |
 | ------------------ | --------------------------------------------- | --------------- |
@@ -134,26 +134,29 @@ stellar contract build
 
 ### Walkthrough & Testing Guide:
 
-To test the complete end-to-end trust flow, we **mandate** using two separate browser profiles (or two different browsers like Chrome + Firefox). This allows you to simulate the Employer and Candidate side-by-side.
+To test the complete end-to-end trust flow, we **mandate** using two separate browser profiles (or two different browsers like Chrome + Firefox). This allows you to simulate the Employer and Candidate side-by-side without wallet conflicts.
 
 1.  **Preparation**:
     *   Install **Freighter** on both browser profiles.
     *   Set both to **Stellar Testnet**.
     *   Fund both wallets using the "Fund with Friendbot" button (10,000 test XLM each).
-2.  **Employer (Browser A)**:
-    *   Connect wallet and enter the portal.
+2.  **Onboarding Guides (New Feature)**:
+    *   Whenever you connect a brand new wallet identity to either the Employer or Candidate dashboards for the first time, a **Quick Guide** will automatically pop up. 
+    *   This is locally tracked: the guide automatically resets and displays itself anytime a *new* unique ID is detected taking on a role.
+3.  **Employer (Browser A)**:
+    *   Connect wallet, review the Quick Guide, and enter the portal.
     *   Copy the **Candidate's address** from Browser B.
     *   Lock funds: Enter the address, add 2-3 milestones (e.g., "Medical Exam" - 50 XLM, "NBI Clearance" - 100 XLM), set a deadline (30 days), and click **Lock Onboarding Funds**.
-3.  **Candidate (Browser B)**:
-    *   Connect wallet and enter the portal.
+4.  **Candidate (Browser B)**:
+    *   Connect wallet, review the Quick Guide, and enter the portal.
     *   You will see a "Pending Acceptance" card. Review the milestones and click **Accept Escrow**.
     *   *System Check*: The status in Browser A (Employer) will instantly flip to "Active".
-4.  **Release Funds (Browser A)**:
+5.  **Release Funds (Browser A)**:
     *   As the Employer, click **Release** on the first milestone.
     *   *System Check*: The Candidate (Browser B) will see the milestone mark as paid, and their XLM balance (top right) will increase.
-5.  **Conflict Simulation (Disputes)**:
+6.  **Conflict Simulation (Disputes)**:
     *   If a deadline expires and funds aren't released, the Candidate (Browser B) can click **Raise Formal Dispute**.
-    *   This transitions the escrow to `Disputed`. A platform arbitrator can then resolve it.
+    *   This transitions the escrow to `Disputed`. The platform arbitrator securely handles the contract.
 
 ## Tech Stack
 

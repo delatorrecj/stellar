@@ -22,7 +22,7 @@ import { getServer } from '../lib/rpc';
 import { useStellar } from './useStellar';
 import { NETWORK_DETAILS } from '../lib/stellar';
 
-const DEFAULT_ARBITRATOR = 'GABTUX53227CZQJSRKS6UMT2VWUZCLX27AGCDLHRS7VYJJB4DBIMHKIU';
+const DEFAULT_ARBITRATOR = import.meta.env.VITE_DEFAULT_ARBITRATOR || 'GABTUX53227CZQJSRKS6UMT2VWUZCLX27AGCDLHRS7VYJJB4DBIMHKIU';
 
 const POLL_INTERVAL = 10_000; // 10 seconds
 
