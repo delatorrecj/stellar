@@ -317,6 +317,7 @@ export const useEscrow = (): UseEscrowReturn => {
     if (escrow.state === 'Pending' || escrow.state === 'Active' || escrow.state === 'Disputed') {
       pollRef.current = setInterval(() => {
         fetchEscrow(escrow.employer, escrow.candidate);
+        refreshBalance();
       }, POLL_INTERVAL);
     }
 
@@ -326,7 +327,7 @@ export const useEscrow = (): UseEscrowReturn => {
         pollRef.current = null;
       }
     };
-  }, [address, escrow?.state, fetchEscrow]);
+  }, [address, escrow?.state, fetchEscrow, refreshBalance]);
 
   return {
     escrow,
