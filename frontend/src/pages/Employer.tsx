@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Search, RotateCcw, ShieldCheck, Wallet, Trash2, Check, Clock, AlertTriangle } from 'lucide-react';
+import { PlusCircle, Search, RotateCcw, ShieldCheck, Wallet, Trash2, Check, AlertTriangle, Copy, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ActivityLedger from '../components/ActivityLedger';
 import { useEscrow } from '../hooks/useEscrow';
@@ -81,9 +81,9 @@ export const Employer: React.FC = () => {
   // ─── Handlers ──────────────────────────────────────────────────
 
   const handleSearch = async () => {
-    if (!searchTarget) return;
+    if (!searchTarget || !address) return;
     saveCandidate(searchTarget);
-    await fetchEscrow(searchTarget);
+    await fetchEscrow(address, searchTarget);
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -122,13 +122,16 @@ export const Employer: React.FC = () => {
       // Focus on the new escrow
       setSearchTarget(currentCandidate);
       saveCandidate(currentCandidate);
-      await fetchEscrow(currentCandidate);
+      if (address) {
+        localStorage.setItem(`stella_employer_${currentCandidate}`, address);
+        await fetchEscrow(address, currentCandidate);
+      }
     } catch (err: any) {
       console.error(err);
       // If it already exists, let's just search for it so the user can see it
       if (err.message?.includes('13') || String(err).includes('already exists')) {
         setSearchTarget(currentCandidate);
-        await fetchEscrow(currentCandidate);
+        if (address) await fetchEscrow(address, currentCandidate);
       }
     }
   };
@@ -155,7 +158,6 @@ export const Employer: React.FC = () => {
     if (address && searchTarget) handleSearch();
   }, [address]);
 
-  const truncatedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
 
   // ─── State Badge ───────────────────────────────────────────────
 
@@ -177,18 +179,18 @@ export const Employer: React.FC = () => {
     );
   };
 
-  // ─── Deadline Display ──────────────────────────────────────────
+  const [linkCopied, setLinkCopied] = useState(false);
 
-  const DeadlineInfo = ({ deadline }: { deadline: number }) => {
-    const now = Math.floor(Date.now() / 1000);
-    const remaining = Math.max(0, Math.ceil((deadline - now) / 86400));
-    const expired = now > deadline;
-    return (
-      <div className={`flex items-center gap-1.5 text-xs font-semibold ${expired ? 'text-red-500' : 'text-neutral-500'}`}>
-        <Clock size={12} />
-        {expired ? 'Deadline expired' : `${remaining} day${remaining !== 1 ? 's' : ''} remaining`}
-      </div>
-    );
+  const handleCopyInviteLink = async () => {
+    if (!address) return;
+    const link = `${window.location.origin}/candidate?employer=${address}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -196,10 +198,13 @@ export const Employer: React.FC = () => {
       {/* Welcome header */}
       <header>
         <p className="text-xs font-semibold text-primary-500 mb-1">Welcome back</p>
-        <h1 className="text-2xl font-extrabold text-neutral-900 tracking-tight mb-1">
-          Employer Workspace
-        </h1>
-        <p className="text-sm text-neutral-400 font-mono">{truncatedAddress}</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-extrabold text-neutral-900 tracking-tight mb-2">
+              Employer Workspace
+            </h1>
+          </div>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -315,11 +320,28 @@ export const Employer: React.FC = () => {
                   <p className="label-section mb-1">Status</p>
                   <StateBadge state={escrow.state} />
                 </div>
-                <ShieldCheck size={18} className="text-primary-500" />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleCopyInviteLink}
+                    className="flex justify-center items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-600 hover:bg-primary-100 rounded-lg text-xs font-bold transition-all border border-primary-100"
+                    title="Copy Invite Link for Candidate"
+                  >
+                    <Copy size={12} />
+                    {linkCopied ? 'Copied!' : 'Invite Link'}
+                  </button>
+                  <ShieldCheck size={18} className="text-primary-500 hidden sm:block" />
+                </div>
               </div>
 
               {/* Deadline info */}
-              <DeadlineInfo deadline={escrow.deadline} />
+              {escrow.deadline > 0 && (
+                <div className="flex items-center gap-2 p-3 bg-neutral-50 rounded-lg border border-neutral-100">
+                  <Clock size={14} className="text-neutral-400" />
+                  <span className="text-xs font-semibold text-neutral-500">
+                    Deadline: {new Date(escrow.deadline * 1000).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
 
               {/* Milestone List */}
               <div>

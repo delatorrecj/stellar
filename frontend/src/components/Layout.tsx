@@ -1,11 +1,12 @@
 import React from 'react';
 import { 
   LogOut,
-  ArrowLeft,
   Menu,
   X,
   Gavel,
-  RefreshCw
+  RefreshCw,
+  Copy,
+  Check
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStellar } from '../hooks/useStellar';
@@ -27,6 +28,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { address, balance, isSyncing, refreshBalance, connect } = useStellar();
   const { role, reset } = useOnboarding();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
 
   const truncatedAddress = address ? `${address.slice(0, 4)}...${address.slice(-4)}` : null;
   const formattedBalance = balance ? `${Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} XLM` : '0.00 XLM';
@@ -40,6 +42,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleReconnect = async () => {
     await connect();
     await refreshBalance();
+  };
+
+  const handleCopyAddress = async () => {
+    if (!address) return;
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy address:', err);
+    }
   };
 
   // ── Workspace chrome ──
@@ -165,11 +178,27 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Header Balance (Desktop) */}
+            {/* Header Balance and Copy (Desktop) */}
             {address && (
-              <div className="hidden sm:flex items-center gap-2 bg-neutral-50 px-3 py-1.5 rounded-full border border-neutral-100">
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                <span className="text-xs font-bold text-neutral-700">{formattedBalance}</span>
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="flex items-center gap-2 bg-neutral-50 px-3 py-1.5 rounded-full border border-neutral-100">
+                  <span className="w-1.5 h-1.5 rounded-full bg-success" />
+                  <span className="text-xs font-bold text-neutral-700">{formattedBalance}</span>
+                </div>
+                <button
+                  onClick={handleCopyAddress}
+                  className="group flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-200 rounded-full hover:border-primary-300 hover:bg-primary-50 transition-all active:scale-95"
+                  title="Copy your Stella address"
+                >
+                  <span className="text-xs font-mono font-medium text-neutral-500 group-hover:text-primary-700">
+                    {truncatedAddress}
+                  </span>
+                  {copied ? (
+                    <Check size={12} className="text-emerald-500" />
+                  ) : (
+                    <Copy size={12} className="text-neutral-400 group-hover:text-primary-600" />
+                  )}
+                </button>
               </div>
             )}
 

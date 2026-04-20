@@ -1,5 +1,5 @@
 /**
- * 🌠 Stella — useEscrow Hook (V1.3 Multi-Milestone)
+ * 🌠 Stella — useEscrow Hook (V1.4 Composite-Key)
  * 
  * Production-ready hook for all escrow operations:
  * - createEscrow (with milestones)
@@ -22,7 +22,6 @@ import { getServer } from '../lib/rpc';
 import { useStellar } from './useStellar';
 import { NETWORK_DETAILS } from '../lib/stellar';
 
-const XLM_SAC_TESTNET = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
 const DEFAULT_ARBITRATOR = 'GABTUX53227CZQJSRKS6UMT2VWUZCLX27AGCDLHRS7VYJJB4DBIMHKIU';
 
 const POLL_INTERVAL = 10_000; // 10 seconds
@@ -33,18 +32,20 @@ interface UseEscrowReturn {
   isTxPending: boolean;
   error: string | null;
   lastTxHash: string | null;
+  employerAddress: string;
   createEscrow: (candidate: string, milestones: MilestoneInput[], durationDays: number) => Promise<void>;
-  candidateAccept: () => Promise<void>;
+  candidateAccept: (employer: string) => Promise<void>;
   releaseMilestone: (candidate: string, milestoneId: number) => Promise<void>;
   clawbackEscrow: (candidate: string) => Promise<void>;
-  raiseDispute: () => Promise<void>;
-  resolveDispute: (candidate: string, candidateBps: number) => Promise<void>;
-  fetchEscrow: (candidate?: string) => Promise<EscrowData | null>;
+  raiseDispute: (employer: string) => Promise<void>;
+  resolveDispute: (employer: string, candidate: string, candidateBps: number) => Promise<void>;
+  fetchEscrow: (employer: string, candidate?: string) => Promise<EscrowData | null>;
+  fetchLatestCandidateEscrow: () => Promise<EscrowData | null>;
   clearError: () => void;
 }
 
 /**
- * Shared transaction handler for V1.3
+ * Shared transaction handler for V1.4
  */
 async function handleStellarTransaction(
   address: string,
@@ -100,9 +101,6 @@ async function handleStellarTransaction(
   await refreshBalance();
 }
 
-
-
-
 export const useEscrow = (): UseEscrowReturn => {
   const { address, refreshBalance } = useStellar();
   const [escrow, setEscrow] = useState<EscrowData | null>(null);
@@ -110,6 +108,7 @@ export const useEscrow = (): UseEscrowReturn => {
   const [isTxPending, setIsTxPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastTxHash, setLastTxHash] = useState<string | null>(null);
+  const [employerAddress, setEmployerAddress] = useState<string>('');
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const clearError = useCallback(() => {
@@ -119,15 +118,39 @@ export const useEscrow = (): UseEscrowReturn => {
 
   // ─── Fetch Escrow ──────────────────────────────────────────────
 
-  const fetchEscrow = useCallback(async (candidate?: string): Promise<EscrowData | null> => {
-    const target = candidate || address;
-    if (!target) return null;
+  const fetchEscrow = useCallback(async (employer: string, candidate?: string): Promise<EscrowData | null> => {
+    const targetCandidate = candidate || address;
+    if (!employer || !targetCandidate) return null;
 
     setLoading(true);
     try {
-      const data = await StellaClient.getEscrow(target);
+      const data = await StellaClient.getEscrow(employer, targetCandidate);
       setEscrow(data);
+      if (data) setEmployerAddress(employer);
       return data;
+    } catch {
+      setEscrow(null);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [address]);
+
+  const fetchLatestCandidateEscrow = useCallback(async (): Promise<EscrowData | null> => {
+    if (!address) return null;
+    setLoading(true);
+    try {
+      const employers = await StellaClient.getCandidateEmployers(address);
+      if (employers && employers.length > 0) {
+        // Find the latest employer
+        const latestEmployer = employers[employers.length - 1];
+        const data = await StellaClient.getEscrow(latestEmployer, address);
+        setEscrow(data);
+        if (data) setEmployerAddress(latestEmployer);
+        return data;
+      }
+      setEscrow(null);
+      return null;
     } catch {
       setEscrow(null);
       return null;
@@ -150,11 +173,11 @@ export const useEscrow = (): UseEscrowReturn => {
     try {
       await handleStellarTransaction(
         address,
-        () => StellaClient.createEscrowTx(address, candidate, XLM_SAC_TESTNET, DEFAULT_ARBITRATOR, milestones, durationDays),
+        () => StellaClient.createEscrowTx(address, candidate, DEFAULT_ARBITRATOR, milestones, durationDays),
         refreshBalance,
         (hash) => setLastTxHash(hash)
       );
-      await fetchEscrow(candidate);
+      await fetchEscrow(address, candidate);
     } catch (err: any) {
       const msg = parseContractError(err);
       setError(msg);
@@ -166,7 +189,7 @@ export const useEscrow = (): UseEscrowReturn => {
 
   // ─── Candidate Accept ──────────────────────────────────────────
 
-  const candidateAccept = useCallback(async () => {
+  const candidateAccept = useCallback(async (employer: string) => {
     if (!address || isTxPending) return;
     setIsTxPending(true);
     setError(null);
@@ -174,11 +197,11 @@ export const useEscrow = (): UseEscrowReturn => {
     try {
       await handleStellarTransaction(
         address,
-        () => StellaClient.candidateAcceptTx(address),
+        () => StellaClient.candidateAcceptTx(employer, address),
         refreshBalance,
         (hash) => setLastTxHash(hash)
       );
-      await fetchEscrow();
+      await fetchEscrow(employer);
     } catch (err: any) {
       const msg = parseContractError(err);
       setError(msg);
@@ -202,7 +225,7 @@ export const useEscrow = (): UseEscrowReturn => {
         refreshBalance,
         (hash) => setLastTxHash(hash)
       );
-      await fetchEscrow(candidate);
+      await fetchEscrow(address, candidate);
     } catch (err: any) {
       const msg = parseContractError(err);
       setError(msg);
@@ -226,7 +249,7 @@ export const useEscrow = (): UseEscrowReturn => {
         refreshBalance,
         (hash) => setLastTxHash(hash)
       );
-      await fetchEscrow(candidate);
+      await fetchEscrow(address, candidate);
     } catch (err: any) {
       const msg = parseContractError(err);
       setError(msg);
@@ -238,7 +261,7 @@ export const useEscrow = (): UseEscrowReturn => {
 
   // ─── Raise Dispute (Candidate) ─────────────────────────────────
 
-  const raiseDispute = useCallback(async () => {
+  const raiseDispute = useCallback(async (employer: string) => {
     if (!address || isTxPending) return;
     setIsTxPending(true);
     setError(null);
@@ -246,11 +269,11 @@ export const useEscrow = (): UseEscrowReturn => {
     try {
       await handleStellarTransaction(
         address,
-        () => StellaClient.raiseDisputeTx(address),
+        () => StellaClient.raiseDisputeTx(employer, address),
         refreshBalance,
         (hash) => setLastTxHash(hash)
       );
-      await fetchEscrow();
+      await fetchEscrow(employer);
     } catch (err: any) {
       const msg = parseContractError(err);
       setError(msg);
@@ -262,7 +285,7 @@ export const useEscrow = (): UseEscrowReturn => {
 
   // ─── Resolve Dispute (Arbitrator) ──────────────────────────────
 
-  const resolveDispute = useCallback(async (candidate: string, candidateBps: number) => {
+  const resolveDispute = useCallback(async (employer: string, candidate: string, candidateBps: number) => {
     if (!address || isTxPending) return;
     setIsTxPending(true);
     setError(null);
@@ -270,11 +293,11 @@ export const useEscrow = (): UseEscrowReturn => {
     try {
       await handleStellarTransaction(
         address,
-        () => StellaClient.resolveDisputeTx(address, candidate, candidateBps),
+        () => StellaClient.resolveDisputeTx(address, employer, candidate, candidateBps),
         refreshBalance,
         (hash) => setLastTxHash(hash)
       );
-      await fetchEscrow(candidate);
+      await fetchEscrow(employer, candidate);
     } catch (err: any) {
       const msg = parseContractError(err);
       setError(msg);
@@ -292,7 +315,7 @@ export const useEscrow = (): UseEscrowReturn => {
 
     if (escrow.state === 'Pending' || escrow.state === 'Active' || escrow.state === 'Disputed') {
       pollRef.current = setInterval(() => {
-        fetchEscrow();
+        fetchEscrow(escrow.employer, escrow.candidate);
       }, POLL_INTERVAL);
     }
 
@@ -310,6 +333,7 @@ export const useEscrow = (): UseEscrowReturn => {
     isTxPending,
     error,
     lastTxHash,
+    employerAddress,
     createEscrow,
     candidateAccept,
     releaseMilestone,
@@ -317,6 +341,7 @@ export const useEscrow = (): UseEscrowReturn => {
     raiseDispute,
     resolveDispute,
     fetchEscrow,
+    fetchLatestCandidateEscrow,
     clearError,
   };
 };
