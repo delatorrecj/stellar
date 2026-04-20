@@ -107,6 +107,26 @@ stella/
 **Network:** Stellar Testnet (V22)
 **Asset:** Native XLM (`CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`)
 
+## ⭐️ Project Stella: The Pitch (Bootcamp Details)
+
+### The Problem
+Fresh graduates in the Philippines looking for BPO jobs accept job offers and then ghost before Day 1 because they lack the ₱3,000–₱5,000 needed for mandatory pre-employment requirements (medical exams, NBI clearance), costing employers thousands in wasted recruitment time and empty seats.
+
+### The Solution
+Stella bridges this gap with a programmable escrow where employers lock onboarding funds into a Soroban smart contract, releasing partial payouts precisely as the candidate completes each verified milestone, ensuring zero-trust liquidity for graduates while protecting the employer's capital from advance-theft.
+
+### Core Feature (MVP) & Why It Wins
+An employer initiates an escrow locking 500 XLM into the Soroban contract. The candidate triggers `unlock_milestone` to securely receive exactly 100 XLM for their first requirement, instantly transferring the requested liquidity directly to their wallet. It directly targets a massive, hyper-local friction point in the Philippine job market, perfectly exemplifying Soroban’s superiority over unsecured cash advances.
+
+---
+
+## 📝 Rise In Submission Details
+
+- **GitHub Repository:** [https://github.com/delatorrecj/stellar](https://github.com/delatorrecj/stellar)
+- **Contract ID:** `CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH`
+- **Stellar Expert Link:** [https://stellar.expert/explorer/testnet/contract/CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH](https://stellar.expert/explorer/testnet/contract/CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH)
+- **Short Description:** Stella uses a programmable milestone-based escrow to end the Day Zero poverty trap for fresh graduates. Employers lock pre-employment funds into a smart contract which conditionally releases exact liquidity to candidates as they complete onboarding requirements.
+
 ## Getting Started
 
 ### Prerequisites

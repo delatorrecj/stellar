@@ -9,6 +9,28 @@ export const Dashboard: React.FC = () => {
   const { setRole, role } = useOnboarding();
   const { address } = useStellar();
   const ctaRef = useRef<HTMLDivElement>(null);
+  const [deferredPrompt, setDeferredPrompt] = React.useState<any>(null);
+  const [showPwaBanner, setShowPwaBanner] = React.useState(false);
+
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowPwaBanner(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+      setShowPwaBanner(false);
+    }
+  };
 
   const handleRoleSelect = (selectedRole: 'employer' | 'candidate') => {
     setRole(selectedRole);
@@ -32,6 +54,37 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="w-full bg-neutral-50 min-h-screen">
+      {/* 
+        ========================================
+        0. PWA INSTALL BANNER
+        ========================================
+      */}
+      {showPwaBanner && (
+        <div className="bg-primary-600 text-white px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-md animate-in slide-in-from-top-4">
+          <div className="flex items-center gap-3">
+            <img src="/S.svg" className="w-8 h-8 brightness-0 invert" alt="Stella" />
+            <div>
+              <p className="text-sm font-bold">Install Stella Web App</p>
+              <p className="text-xs text-primary-100">Add to home screen to track your escrow</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleInstallClick}
+              className="bg-white text-primary-600 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-neutral-50 active:scale-95 transition-all"
+            >
+              Install
+            </button>
+            <button 
+              onClick={() => setShowPwaBanner(false)}
+              className="w-8 h-8 flex items-center justify-center hover:bg-primary-700/50 rounded-full transition-colors font-bold text-lg"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 
         ========================================
         1. HERO SECTION
