@@ -45,7 +45,7 @@ The system operates as a state machine keyed by a composite identifier: `(Employ
 ## 3. Technical Specifications
 
 ### 3.1 Storage Schema
-- **Composite Key:** `DataKey::Escrow(Address, Address)` $ightarrow$ `Escrow` struct.
+- **Composite Key:** `DataKey::Escrow(Address, Address)` → `Escrow` struct.
 - **Instance Storage:** `DataKey::Admin` and `DataKey::Token` (Sovereign XLM SAC).
 
 ### 3.2 Critical API Signatures

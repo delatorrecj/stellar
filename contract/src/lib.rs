@@ -1,26 +1,31 @@
-//! Stella — Soroban Smart Contract (V1.3 Multi-Milestone)
+//! Stella — Soroban Smart Contract (V2.0 Dispute Resolution)
 //!
-//! Ground-up rewrite from V1.0 flat escrow to V1.3 milestone-based state machine.
+//! Full-featured milestone-based escrow with dispute resolution.
 //!
 //! A pre-employment onboarding escrow on Stellar with milestone tracking.
 //! Employers lock XLM tied to specific milestones. Candidates accept the
 //! escrow. Employers release milestones individually as candidates complete
 //! onboarding steps. Employers clawback remaining funds if ghosted.
+//! Candidates can raise disputes post-deadline; arbitrators resolve via BPS split.
 //!
 //! State Machine:
 //!   Pending   → Candidate has not yet accepted
 //!   Active    → Work period. Milestones can be released.
 //!   Complete  → All milestones released.
 //!   Cancelled → Employer clawed back remaining funds.
-//!   Disputed  → Reserved for V2.0.
+//!   Disputed  → Candidate raised a dispute after deadline.
+//!   Resolved  → Arbitrator resolved with BPS-based fund split.
 //!
 //! Functions:
-//!   initialize()       — One-time setup: store admin + token address
-//!   init_escrow()      — Employer locks XLM with milestone array
-//!   candidate_accept() — Candidate accepts, transitions Pending → Active
-//!   unlock_milestone() — Employer releases a specific milestone by ID
-//!   clawback()         — Employer recovers unreleased funds
-//!   get_escrow()       — Read-only escrow lookup
+//!   initialize()            — One-time setup: store admin + token address
+//!   init_escrow()           — Employer locks XLM with milestone array
+//!   candidate_accept()      — Candidate accepts, transitions Pending → Active
+//!   unlock_milestone()      — Employer releases a specific milestone by ID
+//!   clawback()              — Employer recovers unreleased funds
+//!   raise_dispute()         — Candidate disputes post-deadline (Active → Disputed)
+//!   resolve_dispute()       — Arbitrator splits funds via BPS (Disputed → Resolved)
+//!   get_escrow()            — Read-only escrow lookup
+//!   get_candidate_escrows() — List employer addresses for a candidate
 
 #![no_std]
 
@@ -180,7 +185,7 @@ impl StellaContract {
     }
 
     // ─── CANDIDATE ACCEPT ────────────────────────────────────────
-    // New in V1.3. Candidate accepts the escrow, transitioning from
+    // Candidate accepts the escrow, transitioning from
     // Pending → Active. This is how the candidate opts in.
     //
     // Auth:     candidate must sign

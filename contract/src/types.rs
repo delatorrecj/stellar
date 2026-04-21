@@ -1,6 +1,6 @@
-//! Stella — Type Definitions (V1.3 Multi-Milestone)
+//! Stella — Type Definitions (V2.0 Dispute Resolution)
 //!
-//! Ground-up rewrite from V1.0 flat escrow to V1.3 milestone-based state machine.
+//! Full-featured milestone-based escrow with dispute resolution types.
 //! All data types used by the Stella escrow contract.
 //! Storage keys, milestone struct, escrow state machine, and error codes.
 
@@ -54,11 +54,12 @@ pub struct Milestone {
 // ─── Escrow State Machine ────────────────────────────────────────
 // Governs the lifecycle of every escrow.
 //
-//   [init_escrow]       → Pending
-//   [candidate_accept]  → Active
-//   [unlock all]        → Complete
-//   [clawback]          → Cancelled
-//   [raise_dispute]     → Disputed  (V2.0 — reserved)
+//!   [init_escrow]       → Pending
+//!   [candidate_accept]  → Active
+//!   [unlock all]        → Complete
+//!   [clawback]          → Cancelled
+//!   [raise_dispute]     → Disputed
+//!   [resolve_dispute]   → Resolved
 
 #[contracttype]
 #[derive(Clone, Debug, PartialEq)]

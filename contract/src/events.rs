@@ -1,4 +1,4 @@
-//! Stella — Event Emission Helpers (V1.3 Multi-Milestone)
+//! Stella — Event Emission Helpers (V2.0 Dispute Resolution)
 //!
 //! On-chain events that frontends and judges can observe.
 //! Events are emitted AFTER state changes and token transfers.

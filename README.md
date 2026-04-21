@@ -27,7 +27,7 @@ Stella bridges the trust gap between employers and job candidates during onboard
 
 ## Architecture
 
-### System Design (V1.3 Multi-Milestone State Machine)
+### System Design (V2.0 Dispute-Resolution State Machine)
 
 ```mermaid
 stateDiagram-v2
@@ -72,22 +72,29 @@ graph TD
 
 ```
 stella/
-├── contract/          Soroban smart contract (Rust)
+├── contract/              Soroban smart contract (Rust)
 │   └── src/
-│       ├── lib.rs     Dispute Resolution & Lifecycle Logic
-│       ├── test.rs    25 performance-graded unit tests
-│       ├── types.rs   Disputed/Resolved state machine
-│       └── events.rs  DisputeRaised & DisputeResolved events
+│       ├── lib.rs         V2.0 Lifecycle + Dispute Resolution Logic
+│       ├── test.rs        25 unit tests (T-01 to T-25)
+│       ├── types.rs       State machine (Pending → … → Resolved)
+│       └── events.rs      7 on-chain event emitters
 │
-├── frontend/          React + Vite dApp (PWA)
+├── frontend/              React + Vite dApp (PWA)
 │   └── src/
-│       ├── pages/     Employer, Candidate, Arbitrator (Resolution Dash)
-│       ├── hooks/     useEscrow (Dispute Guards & Polling)
-│       ├── lib/       Contract Client & RPC Node Pool
-│       └── components/ TransactionToasts & UI Primitives
+│       ├── pages/         Dashboard, Onboarding, Employer, Candidate, Arbitrator
+│       ├── hooks/         useEscrow, useStellar, useActivity, useOnboarding
+│       ├── lib/           Contract Client (contract.ts), RPC Pool (rpc.ts)
+│       └── components/    ActiveEscrowCard, CreateEscrowForm, QuickGuide, etc.
 │
-├── docs/              Full project documentation
-└── README.md          ← You are here
+├── docs/                  Project documentation
+│   ├── product_requirements.md   PRD & API signatures
+│   ├── branding.md               Brand guidelines & design tokens
+│   └── context.md                Bootcamp context & session log
+│
+├── scripts/               Utility scripts
+│   └── init_contract.mjs  One-time contract initialization
+│
+└── README.md              ← You are here
 ```
 
 ## Smart Contract (V2.0)
@@ -102,6 +109,7 @@ stella/
 | `raise_dispute`    | Flag contract for arbitration (Post-Deadline) | Candidate       |
 | `resolve_dispute`  | Final fund split by trusted third-party       | Arbitrator Only |
 | `get_escrow`       | Fetches on-chain state & progress             | Public          |
+| `get_candidate_escrows` | Lists employer addresses for a candidate | Public          |
 
 **Contract ID:** `CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH`
 **Network:** Stellar Testnet (V22)
@@ -116,7 +124,7 @@ Fresh graduates in the Philippines looking for BPO jobs accept job offers and th
 Stella bridges this gap with a programmable escrow where employers lock onboarding funds into a Soroban smart contract, releasing partial payouts precisely as the candidate completes each verified milestone, ensuring zero-trust liquidity for graduates while protecting the employer's capital from advance-theft.
 
 ### Core Feature (MVP) & Why It Wins
-An employer initiates an escrow locking 500 XLM into the Soroban contract. The candidate triggers `unlock_milestone` to securely receive exactly 100 XLM for their first requirement, instantly transferring the requested liquidity directly to their wallet. It directly targets a massive, hyper-local friction point in the Philippine job market, perfectly exemplifying Soroban’s superiority over unsecured cash advances.
+An employer initiates an escrow locking 500 XLM into the Soroban contract. The employer then triggers `unlock_milestone` to securely release exactly 100 XLM for the candidate's first requirement, instantly transferring the funds directly to their wallet. It directly targets a massive, hyper-local friction point in the Philippine job market, perfectly exemplifying Soroban's superiority over unsecured cash advances.
 
 ---
 

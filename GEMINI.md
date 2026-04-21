@@ -57,20 +57,12 @@ stellar contract deploy --wasm target/wasm32-unknown-unknown/release/stella.wasm
 - **Security First:** Every mutating function MUST start with `require_auth()`.
 - **Storage:** Use `persistent()` storage for all financial data (balances, escrow state).
 - **Arithmetic:** Use `i128` for all token amounts (stroops) and employ checked arithmetic (`checked_add`, `checked_sub`).
-- **Execution Order:** Follow the pattern: `Auth` $
-ightarrow$ `Validate` $
-ightarrow$ `Check State` $
-ightarrow$ `Write State` $
-ightarrow$ `Transfer Tokens` $
-ightarrow$ `Emit Event`.
+- **Execution Order:** Follow the pattern: `Auth` → `Validate` → `Check State` → `Write State` → `Transfer Tokens` → `Emit Event`.
 - **No Std:** The contract is `#![no_std]`. Use `soroban_sdk` types instead of `std` collections.
 
 ### Frontend Guidelines
 - **Amount Conversion:** Always convert between XLM and stroops (1 XLM = 10,000,000 stroops) at the boundary using `BigInt`.
-- **Transaction Lifecycle:** Always follow: `Build` $
-ightarrow$ `Simulate` $
-ightarrow$ `Sign (Freighter)` $
-ightarrow$ `Submit`.
+- **Transaction Lifecycle:** Always follow: `Build` → `Simulate` → `Sign (Freighter)` → `Submit`.
 - **Error Handling:** Map numeric contract error codes to user-friendly messages using a mapping object.
 
 ### Project Structure
