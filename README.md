@@ -200,6 +200,12 @@ To test the complete end-to-end trust flow, we **mandate** using two separate br
 | Network  | Stellar Testnet, Soroban RPC             |
 | Design   | "Warm Fintech Trust" (Plus Jakarta Sans) |
 
+## TESTS
+
+![test 1](image.png)
+![test 2](image-1.png)
+![test 3](image-2.png)
+
 ## Author
 
 - Carlos Jerico Dela Torre

@@ -54,12 +54,12 @@ pub struct Milestone {
 // ─── Escrow State Machine ────────────────────────────────────────
 // Governs the lifecycle of every escrow.
 //
-//!   [init_escrow]       → Pending
-//!   [candidate_accept]  → Active
-//!   [unlock all]        → Complete
-//!   [clawback]          → Cancelled
-//!   [raise_dispute]     → Disputed
-//!   [resolve_dispute]   → Resolved
+//   [init_escrow]       → Pending
+//   [candidate_accept]  → Active
+//   [unlock all]        → Complete
+//   [clawback]          → Cancelled
+//   [raise_dispute]     → Disputed
+//   [resolve_dispute]   → Resolved
 
 #[contracttype]
 #[derive(Clone, Debug, PartialEq)]

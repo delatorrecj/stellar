@@ -6,7 +6,7 @@ description = "Soroban-powered pre-employment onboarding escrow on Stellar"
 license = "MIT"
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+crate-type = ["rlib"]
 # NOTE: If `cargo test` fails on Windows GNU with "export ordinal too large",
 # temporarily change crate-type to ["rlib"] for testing, then restore for WASM build.
 

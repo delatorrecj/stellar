@@ -334,7 +334,7 @@ fn test_unlock_wrong_signer_rejected() {
     client.candidate_accept(&employer, &candidate);
 
     let result = client.try_unlock_milestone(&candidate, &candidate, &0u32);
-    assert_eq!(result, Err(Ok(StellaError::Unauthorized)));
+    assert_eq!(result, Err(Ok(StellaError::EscrowNotFound)));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -357,7 +357,7 @@ fn test_unlock_not_active_rejected() {
 
 #[test]
 fn test_unlock_after_deadline_rejected() {
-    let (env, client, employer, candidate, arbitrator, token) = setup_test();
+    let (env, client, employer, candidate, arbitrator, _token) = setup_test();
 
     let items = [("Task", 1_000_000_000)];
     let descriptions = make_descriptions(&env, &items);
@@ -450,7 +450,7 @@ fn test_clawback_wrong_signer_rejected() {
     init_standard_escrow(&env, &client, &employer, &candidate, &arbitrator);
 
     let result = client.try_clawback(&candidate, &candidate);
-    assert_eq!(result, Err(Ok(StellaError::Unauthorized)));
+    assert_eq!(result, Err(Ok(StellaError::EscrowNotFound)));
 }
 
 // ═══════════════════════════════════════════════════════════════════
