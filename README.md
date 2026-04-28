@@ -1,7 +1,11 @@
 # ⭐ Stella ⭐
 
 <div align="center">
-  <img src="frontend/public/S.svg" alt="Stella Logo" width="120"/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="frontend/public/S-light.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="frontend/public/S.svg" />
+    <img src="frontend/public/S.svg" alt="Stella Logo" width="120" />
+  </picture>
   <h1>Stella</h1>
   
   <p><strong>A milestone-based escrow dApp built on Soroban to end the Day Zero poverty trap for fresh graduates.</strong></p>
@@ -115,7 +119,7 @@ stella/
 **Network:** Stellar Testnet (V22)
 **Asset:** Native XLM (`CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`)
 
-## ⭐️ Project Stella: The Pitch (Bootcamp Details)
+## ⭐️ Project Stella (Bootcamp Pitch)
 
 ### The Problem
 
@@ -128,6 +132,11 @@ Stella bridges this gap with a programmable escrow where employers lock onboardi
 ### Core Feature (MVP) & Why It Wins
 
 An employer initiates an escrow locking 500 XLM into the Soroban contract. The employer then triggers `unlock_milestone` to securely release exactly 100 XLM for the candidate's first requirement, instantly transferring the funds directly to their wallet. It directly targets a massive, hyper-local friction point in the Philippine job market, perfectly exemplifying Soroban's superiority over unsecured cash advances.
+
+## 1-MIN DEMO VIDEO
+
+<video src="Stella Walkthrough.mp4" controls width="100%"></video>
+
 
 ---
 
@@ -184,7 +193,7 @@ To test the complete end-to-end trust flow, we **mandate** using two separate br
     - _System Check_: The status in Browser A (Employer) will instantly flip to "Active".
 5.  **Release Funds (Browser A)**:
     - As the Employer, click **Release** on the first milestone.
-    - _System Check_: The Candidate (Browser B) will see the milestone mark as paid, and their XLM balance (top right) will increase.
+    - _System Check_: The Candidate (Browser B) will see the milestone mark as paid, and their XLM balance (top left) will increase.
 6.  **Conflict Simulation (Disputes)**:
     - If a deadline expires and funds aren't released, the Candidate (Browser B) can click **Raise Formal Dispute**.
     - This transitions the escrow to `Disputed`. The platform arbitrator securely handles the contract.
@@ -198,7 +207,7 @@ To test the complete end-to-end trust flow, we **mandate** using two separate br
 | PWA      | vite-plugin-pwa, Service Workers         |
 | Wallet   | Freighter API v6                         |
 | Network  | Stellar Testnet, Soroban RPC             |
-| Design   | "Warm Fintech Trust" (Plus Jakarta Sans) |
+| Design   | "Warm Fintech Trust" (Google Sans Flex + Inter) |
 
 ## TESTS
 

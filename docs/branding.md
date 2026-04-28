@@ -166,12 +166,20 @@ Readability on budget phones under Manila sunlight > aesthetic uniqueness. Kevin
 
 ### Font Selection
 
-#### Display + Body: **Plus Jakarta Sans**
-- **Why:** Warm geometric sans-serif with soft terminals. More personality than Inter, more readable than Poppins. Excellent weight range (200–800). Designed for UI. Free on Google Fonts.
-- **Fallback stack:** `'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
+#### Display: **Google Sans Flex**
+- **Why:** Highly flexible variable font with excellent legibility and a premium feel. Perfect for headings and hero sections.
+- **Fallback stack:** `'Google Sans Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
 
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+```
+
+#### Body: **Inter**
+- **Why:** The industry standard for UI legibility. Extremely readable at small sizes on all screen types.
+- **Fallback stack:** `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 ```
 
 #### Monospace (transaction hashes, addresses): **JetBrains Mono**
@@ -505,18 +513,27 @@ This is critical. Our users don't speak blockchain.
 ## 10. LOGO & BRAND MARK
 
 ### Logo Construction
-- **Wordmark:** "Stella" in Plus Jakarta Sans ExtraBold (800)
+- **Wordmark:** "Stella" in Google Sans Flex Bold (700)
 - **Brand mark:** A simple 5-pointed star in `accent-500` (amber), placed to the upper-right of the last 'a' — like a guiding star
 - **Minimum size:** 80px wide (digital)
 - **Clear space:** 1× the height of the star on all sides
 
+### Logo Files
+
+| File             | Purpose                                         |
+|------------------|-------------------------------------------------|
+| `S.svg`          | Dark blue logo — for light backgrounds           |
+| `S-light.svg`    | White logo — for dark backgrounds                |
+| `favicon.svg`    | Smart favicon — auto-switches via `prefers-color-scheme` CSS |
+
 ### Logo Usage
 
 | Context            | Format          |
-|--------------------|-----------------|
-| Light background   | `neutral-900` wordmark + `accent-500` star |
-| Dark background    | `neutral-0` (white) wordmark + `accent-300` star |
-| Favicon            | Star only, `accent-500` on `primary-700` circle |
+|--------------------|--------------------|
+| Light background   | `S.svg` — dark blue (`#082660`) |
+| Dark background    | `S-light.svg` — white (`#FFFFFF`) |
+| Favicon (browser)  | `favicon.svg` — auto-detects light/dark mode |
+| README (GitHub)    | `<picture>` element with `prefers-color-scheme` media queries |
 | Loading screen     | Star only, centered, subtle pulse animation |
 
 ### Logo Don'ts
@@ -590,11 +607,12 @@ Things that **must never appear** in Stella's UI:
 ## 14. CHANGELOG
 
 ```
+v1.1.0 — 2026-04-28 | Updated typography to Google Sans Flex and Inter | Antigravity
 v1.0.0 — 2026-04-18
   Initial brand guidelines created
   User-centric design rationale (Kevin + Maria personas)
   Rejected glassmorphism in favor of Warm Fintech Trust aesthetic
-  Defined: color system, typography (Plus Jakarta Sans), spacing, motion
+  Defined: color system, typography (Google Sans Flex + Inter), spacing, motion
   Defined: component patterns, voice & copy, terminology map
   Author: Jerico
 ```

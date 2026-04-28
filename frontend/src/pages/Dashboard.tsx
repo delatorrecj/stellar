@@ -3,6 +3,8 @@ import { Users, UserCheck, Star, ArrowRight, ShieldCheck, Briefcase, ChevronRigh
 import { useNavigate } from 'react-router-dom';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { useStellar } from '../hooks/useStellar';
+import { Logo } from '../components/Logo';
+
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ export const Dashboard: React.FC = () => {
       {showPwaBanner && (
         <div className="bg-primary-600 text-white px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-md animate-in slide-in-from-top-4">
           <div className="flex items-center gap-3">
-            <img src="/S.svg" className="w-8 h-8 brightness-0 invert" alt="Stella" />
+            <Logo className="w-8 h-8" variant="light" />
             <div>
               <p className="text-sm font-bold">Install Stella Web App</p>
               <p className="text-xs text-primary-100">Add to home screen to track your escrow</p>
@@ -97,7 +99,7 @@ export const Dashboard: React.FC = () => {
 
         <div className="max-w-4xl mx-auto text-center mt-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-700 text-sm font-semibold mb-10 border border-primary-100 shadow-sm">
-            <img src="/S.svg" className="w-4 h-4" alt="Stella" />
+            <Logo className="w-4 h-4" />
             <span>Built on Soroban Smart Contracts</span>
           </div>
           
@@ -425,7 +427,7 @@ export const Dashboard: React.FC = () => {
       {/* Footer */}
       <footer className="py-8 text-center bg-white border-t border-neutral-100">
         <p className="text-sm font-semibold text-neutral-400 flex items-center justify-center gap-2">
-          <img src="/S.svg" className="w-4 h-4 opacity-50 grayscale" alt="Stella" /> 
+          <Logo className="w-4 h-4 opacity-50 grayscale" /> 
           Stella Escrow Protocol • Built for the Stellar Bootcamp
         </p>
       </footer>

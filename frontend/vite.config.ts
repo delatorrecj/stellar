@@ -19,7 +19,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['S.svg', 'favicon.svg', 'favicon-32.svg'],
+      includeAssets: ['S.svg', 'S-light.svg', 'favicon.svg', 'favicon-32.svg'],
       manifest: {
         name: "Stella — Secure Your Onboarding",
         short_name: "Stella",

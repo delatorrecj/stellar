@@ -81,8 +81,15 @@
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
+  @media (prefers-color-scheme: dark) {
+    :root {
+      background-color: var(--color-neutral-900);
+      color: var(--color-neutral-300);
+    }
+  }
+
   body {
-    @apply m-0 min-h-screen text-base leading-relaxed;
+    @apply m-0 min-h-screen text-base leading-relaxed bg-[var(--background-color)] text-[var(--color)];
   }
 
   h1, h2, h3, h4, h5, h6 {
