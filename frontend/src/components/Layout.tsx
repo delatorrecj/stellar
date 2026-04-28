@@ -59,13 +59,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   // ── Workspace chrome ──
   return (
-    <div className="flex h-screen bg-neutral-100 dark:bg-neutral-900 antialiased text-neutral-600 dark:text-neutral-400 overflow-hidden">
+    <div className="flex h-screen bg-neutral-100 antialiased text-neutral-600 overflow-hidden">
       {/* Sidebar — Desktop */}
-      <aside className="hidden lg:flex flex-col w-72 bg-white dark:bg-neutral-800 border-r border-neutral-200 dark:border-neutral-700 p-6 z-50">
+      <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-neutral-200 p-6 z-50">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 mb-10 no-underline">
           <Logo className="w-7 h-7" />
-          <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Stella</span>
+          <span className="text-xl font-bold tracking-tight text-neutral-900">Stella</span>
         </Link>
 
         {/* Balance Card (Premium) */}
@@ -160,12 +160,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="h-16 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between px-6 lg:px-8 z-40 shrink-0">
+        <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-6 lg:px-8 z-40 shrink-0">
           {/* Mobile: logo + role */}
           <div className="lg:hidden flex items-center gap-3">
             <Logo className="w-6 h-6" />
             <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-tight text-neutral-900 dark:text-white leading-none">Stella</span>
+              <span className="text-sm font-bold tracking-tight text-neutral-900 leading-none">Stella</span>
               <span className="text-[10px] font-bold text-primary-600 uppercase tracking-wider">
                 {role === 'employer' ? 'Employer' : 'Candidate'}
               </span>
