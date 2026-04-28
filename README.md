@@ -285,13 +285,13 @@ To test the complete end-to-end trust flow, use two separate browser profiles (o
 
 The following improvements are planned based on initial user testing and feedback collected via the Google Form:
 
-| Priority | Improvement | Rationale |
-|---|---|---|
-| 🔴 High | **Email notifications** for milestone releases | Users want to be alerted without checking the app |
-| 🔴 High | **Mobile wallet support** (Lobstr, xBull) | Freighter is desktop-only; candidates are on mobile |
-| 🟡 Medium | **Multi-currency escrows** (USDC via SEP-24) | XLM volatility is a concern for fixed-cost milestones |
-| 🟡 Medium | **Arbitrator marketplace** | Allow candidates to choose their arbitrator |
-| 🟢 Low | **Escrow templates** | Pre-built milestone sets for common BPO requirements |
+| Priority  | Improvement                                    | Rationale                                             |
+| --------- | ---------------------------------------------- | ----------------------------------------------------- |
+| 🔴 High   | **Email notifications** for milestone releases | Users want to be alerted without checking the app     |
+| 🔴 High   | **Mobile wallet support** (Lobstr, xBull)      | Freighter is desktop-only; candidates are on mobile   |
+| 🟡 Medium | **Multi-currency escrows** (USDC via SEP-24)   | XLM volatility is a concern for fixed-cost milestones |
+| 🟡 Medium | **Arbitrator marketplace**                     | Allow candidates to choose their arbitrator           |
+| 🟢 Low    | **Escrow templates**                           | Pre-built milestone sets for common BPO requirements  |
 
 > Improvement commit history: tracked in [CHANGELOG](https://github.com/delatorrecj/stellar/commits/main)
 
@@ -299,20 +299,20 @@ The following improvements are planned based on initial user testing and feedbac
 
 ## ⚫ Level 6 Black Belt Checklist
 
-| Requirement | Status |
-|---|---|
-| 30+ verified active users | ⏳ Actively onboarding |
-| Metrics dashboard live | ✅ `/admin/metrics` |
-| Security checklist completed | ✅ [security-checklist.md](docs/security-checklist.md) |
-| Monitoring active | ✅ Vercel Analytics + Speed Insights |
-| Data indexing implemented | ✅ Soroban RPC `getEvents` indexer |
-| Full documentation | ✅ Architecture · User Guide · Security |
-| Advanced feature (Fee Sponsorship) | ✅ `lib/sponsor.ts` — FeeBumpTransaction |
-| CI/CD pipeline | ✅ GitHub Actions [badge](https://github.com/delatorrecj/stellar/actions/workflows/ci.yml) |
-| Demo video | ✅ [YouTube](https://youtu.be/-ttPz9u8iZk) |
-| Google Form for user feedback | ✅ [forms.gle/BPs6fbP5yz2NgfA47](https://forms.gle/BPs6fbP5yz2NgfA47) |
-| Community contribution (Twitter post) | ⏳ Pending |
-| 15+ meaningful commits | ✅ 30+ commits |
+| Requirement                           | Status                                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 30+ verified active users             | ⏳ Actively onboarding                                                                     |
+| Metrics dashboard live                | ✅ `/admin/metrics`                                                                        |
+| Security checklist completed          | ✅ [security-checklist.md](docs/security-checklist.md)                                     |
+| Monitoring active                     | ✅ Vercel Analytics + Speed Insights                                                       |
+| Data indexing implemented             | ✅ Soroban RPC `getEvents` indexer                                                         |
+| Full documentation                    | ✅ Architecture · User Guide · Security                                                    |
+| Advanced feature (Fee Sponsorship)    | ✅ `lib/sponsor.ts` — FeeBumpTransaction                                                   |
+| CI/CD pipeline                        | ✅ GitHub Actions [badge](https://github.com/delatorrecj/stellar/actions/workflows/ci.yml) |
+| Demo video                            | ✅ [YouTube](https://youtu.be/-ttPz9u8iZk)                                                 |
+| Google Form for user feedback         | ✅ [forms.gle/BPs6fbP5yz2NgfA47](https://forms.gle/BPs6fbP5yz2NgfA47)                      |
+| Community contribution (Twitter post) | ✅ [X](https://x.com/delatorrecj_/status/2049186715110391830)                              |
+| 15+ meaningful commits                | ✅ 50+ commits                                                                             |
 
 ---
 
