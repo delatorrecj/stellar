@@ -1,72 +1,57 @@
 /**
- * Stella — Horizon Event Indexer
+ * Stella — Soroban RPC Event Indexer v2
  *
- * Fetches and indexes all contract activity from the Stellar Horizon API.
- * Results are cached in localStorage with a 5-minute TTL to avoid
- * hammering the RPC on every dashboard load.
+ * Uses the Soroban RPC `getEvents` method to index contract activity.
+ * The previous version used Horizon /accounts/{C…}/operations which returns
+ * empty results for Soroban contract IDs — they are not classic accounts.
+ *
+ * Events are available for the last ~17,280 ledgers (≈24 h on testnet).
  */
 
-const HORIZON_URL = 'https://horizon-testnet.stellar.org';
-const CONTRACT_ID = import.meta.env.VITE_CONTRACT_ID ?? 'CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH';
-const CACHE_KEY = 'stella_indexer_cache';
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+import { xdr, scValToNative } from '@stellar/stellar-sdk';
 
-// ─── Types ────────────────────────────────────────────────────────
+const SOROBAN_RPC =
+  import.meta.env.VITE_SOROBAN_RPC_URL ?? 'https://soroban-testnet.stellar.org';
+const CONTRACT_ID =
+  import.meta.env.VITE_CONTRACT_ID ??
+  'CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH';
+const CACHE_KEY = 'stella_indexer_v2_cache';
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const RETENTION_LEDGERS = 17_000; // conservative ~24 h
 
-export interface HorizonOperation {
+// ─── Public types ─────────────────────────────────────────────────
+
+export interface ContractEvent {
   id: string;
-  type: string;
-  type_i: number;
-  created_at: string;
-  transaction_hash: string;
+  txHash: string;
+  createdAt: string; // ISO
+  eventType: string; // e.g. "escrow_created"
   source_account: string;
-  from?: string;
-  to?: string;
-  amount?: string;
-  asset_type?: string;
-}
-
-export interface HorizonEffect {
-  id: string;
-  type: string;
-  type_i: number;
-  created_at: string;
-  account: string;
-  amount?: string;
-}
-
-export interface IndexerStats {
-  totalTransactions: number;
-  uniqueWallets: Set<string>;
-  totalXlmLocked: number;
-  totalXlmReleased: number;
-  recentOperations: HorizonOperation[];
-  dailyCounts: DailyCount[];
-  lastUpdated: number;
+  type: string;      // alias for eventType (Metrics page compat)
+  transaction_hash: string; // alias for txHash
 }
 
 export interface DailyCount {
-  date: string;      // YYYY-MM-DD
+  date: string;
   count: number;
 }
 
-export interface CachedData {
-  stats: SerializableStats;
-  timestamp: number;
-}
-
-// Set is not JSON-serializable, so we use a plain version for caching
 export interface SerializableStats {
   totalTransactions: number;
   uniqueWallets: string[];
   totalXlmLocked: number;
   totalXlmReleased: number;
-  recentOperations: HorizonOperation[];
+  recentOperations: ContractEvent[];
   dailyCounts: DailyCount[];
   lastUpdated: number;
 }
 
-// ─── Cache Helpers ────────────────────────────────────────────────
+// ─── Cache ────────────────────────────────────────────────────────
+
+interface CachedData {
+  stats: SerializableStats;
+  timestamp: number;
+}
 
 function loadCache(): SerializableStats | null {
   try {
@@ -82,79 +67,140 @@ function loadCache(): SerializableStats | null {
 
 function saveCache(stats: SerializableStats) {
   try {
-    const cached: CachedData = { stats, timestamp: Date.now() };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ stats, timestamp: Date.now() }));
   } catch {
-    // localStorage may be full — silently ignore
+    // ignore quota errors
   }
 }
 
-// ─── Horizon Fetch Helpers ────────────────────────────────────────
+// ─── Soroban RPC helpers ──────────────────────────────────────────
 
-async function fetchAllPages<T>(url: string, limit = 200): Promise<T[]> {
-  const results: T[] = [];
-  let nextUrl: string | null = `${url}&limit=${limit}&order=desc`;
-
-  while (nextUrl && results.length < 2000) {
-    const res: Response = await fetch(nextUrl);
-    if (!res.ok) break;
-    const data: { _embedded?: { records?: T[] }; _links?: { next?: { href?: string } } } = await res.json();
-    const records: T[] = data._embedded?.records ?? [];
-    results.push(...records);
-    nextUrl = records.length === limit ? data._links?.next?.href ?? null : null;
-  }
-
-  return results;
+async function rpcCall<T>(method: string, params?: unknown): Promise<T> {
+  const res = await fetch(SOROBAN_RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+  });
+  const json = await res.json();
+  if (json.error) throw new Error(`RPC ${method}: ${json.error.message}`);
+  return json.result as T;
 }
 
-// ─── Main Indexer ─────────────────────────────────────────────────
+interface LatestLedgerResult {
+  sequence: number;
+}
 
-export async function fetchIndexerStats(forceRefresh = false): Promise<SerializableStats> {
-  // Return cached data if valid and not forcing refresh
+interface RpcEvent {
+  id: string;
+  type: string;
+  ledger: number;
+  ledgerClosedAt: string;
+  contractId: string;
+  txHash: string;
+  topic: string[];
+  value: string | { xdr: string };
+}
+
+interface GetEventsResult {
+  events: RpcEvent[];
+  latestLedger: number;
+  cursor?: string;
+}
+
+// ─── XDR decode helpers ───────────────────────────────────────────
+
+function decodeScVal(base64: string): unknown {
+  try {
+    const scVal = xdr.ScVal.fromXDR(base64, 'base64');
+    return scValToNative(scVal);
+  } catch {
+    return null;
+  }
+}
+
+/** Returns the first topic as a human-readable event name */
+function eventName(topics: string[]): string {
+  if (!topics.length) return 'contract_call';
+  const name = decodeScVal(topics[0]);
+  if (typeof name === 'string') return name;
+  return 'contract_call';
+}
+
+/** Returns all address-like strings from the topics (employer, candidate…) */
+function extractAddresses(topics: string[]): string[] {
+  return topics
+    .slice(1)
+    .map(t => decodeScVal(t))
+    .filter((v): v is string => typeof v === 'string' && v.length > 20);
+}
+
+// ─── Main indexer ─────────────────────────────────────────────────
+
+async function fetchAllEvents(): Promise<RpcEvent[]> {
+  // 1. Get current ledger
+  const { sequence } = await rpcCall<LatestLedgerResult>('getLatestLedger');
+  const startLedger = Math.max(1, sequence - RETENTION_LEDGERS);
+
+  const allEvents: RpcEvent[] = [];
+  let cursor: string | undefined;
+
+  // Paginate until no more events
+  for (let page = 0; page < 50; page++) {
+    const result = await rpcCall<GetEventsResult>('getEvents', {
+      startLedger,
+      filters: [{ type: 'contract', contractIds: [CONTRACT_ID] }],
+      pagination: { limit: 200, ...(cursor ? { cursor } : {}) },
+    });
+
+    allEvents.push(...result.events);
+
+    if (!result.cursor || result.events.length < 200) break;
+    cursor = result.cursor;
+  }
+
+  return allEvents;
+}
+
+export async function fetchIndexerStats(
+  forceRefresh = false,
+): Promise<SerializableStats> {
   if (!forceRefresh) {
     const cached = loadCache();
     if (cached) return cached;
   }
 
-  // Fetch operations for the contract account
-  const ops = await fetchAllPages<HorizonOperation>(
-    `${HORIZON_URL}/accounts/${CONTRACT_ID}/operations?`,
-    200
-  );
+  const events = await fetchAllEvents();
 
-  // Fetch effects for token transfer tracking
-  const effects = await fetchAllPages<HorizonEffect>(
-    `${HORIZON_URL}/accounts/${CONTRACT_ID}/effects?`,
-    200
-  );
-
-  // Count unique wallets from all operations
-  const uniqueWallets = new Set<string>();
-  ops.forEach(op => {
-    if (op.source_account) uniqueWallets.add(op.source_account);
-    if (op.from) uniqueWallets.add(op.from);
-    if (op.to) uniqueWallets.add(op.to);
+  // Build unique wallets from address topics
+  const walletSet = new Set<string>();
+  events.forEach(ev => {
+    extractAddresses(ev.topic).forEach(a => walletSet.add(a));
   });
-  // Remove the contract itself
-  uniqueWallets.delete(CONTRACT_ID);
+  walletSet.delete(CONTRACT_ID);
 
-  // Calculate XLM locked (credits to contract) and released (debits from contract)
+  // XLM locked / released — inferred from event type
   let totalXlmLocked = 0;
   let totalXlmReleased = 0;
-
-  effects.forEach(effect => {
-    const amount = parseFloat(effect.amount ?? '0');
-    if (isNaN(amount)) return;
-
-    if (effect.type === 'account_credited' && effect.account === CONTRACT_ID) {
-      totalXlmLocked += amount;
+  events.forEach(ev => {
+    const name = eventName(ev.topic);
+    // value is always the amount in stroops for fund-moving events
+    if (name === 'escrow_created' || name === 'init_escrow') {
+      const raw = typeof ev.value === 'string' ? ev.value : ev.value?.xdr ?? '';
+      const decoded = decodeScVal(raw);
+      if (typeof decoded === 'bigint') {
+        totalXlmLocked += Number(decoded) / 1e7;
+      }
     }
-    if (effect.type === 'account_debited' && effect.account === CONTRACT_ID) {
-      totalXlmReleased += amount;
+    if (name === 'milestone_released' || name === 'clawback') {
+      const raw = typeof ev.value === 'string' ? ev.value : ev.value?.xdr ?? '';
+      const decoded = decodeScVal(raw);
+      if (typeof decoded === 'bigint') {
+        totalXlmReleased += Number(decoded) / 1e7;
+      }
     }
   });
 
-  // Build daily transaction counts (last 30 days)
+  // Daily counts (last 30 days)
   const dailyMap = new Map<string, number>();
   const now = new Date();
   for (let i = 29; i >= 0; i--) {
@@ -162,24 +208,36 @@ export async function fetchIndexerStats(forceRefresh = false): Promise<Serializa
     d.setDate(d.getDate() - i);
     dailyMap.set(d.toISOString().slice(0, 10), 0);
   }
-  ops.forEach(op => {
-    const date = op.created_at.slice(0, 10);
+  events.forEach(ev => {
+    const date = ev.ledgerClosedAt.slice(0, 10);
     if (dailyMap.has(date)) {
       dailyMap.set(date, (dailyMap.get(date) ?? 0) + 1);
     }
   });
-  const dailyCounts: DailyCount[] = Array.from(dailyMap.entries()).map(([date, count]) => ({
-    date,
-    count,
-  }));
+
+  // Map to the shape Metrics.tsx expects
+  const recentOperations: ContractEvent[] = events
+    .slice(0, 20)
+    .map(ev => ({
+      id: ev.id,
+      txHash: ev.txHash,
+      transaction_hash: ev.txHash,
+      createdAt: ev.ledgerClosedAt,
+      eventType: eventName(ev.topic),
+      type: eventName(ev.topic),
+      source_account: extractAddresses(ev.topic)[0] ?? CONTRACT_ID,
+    }));
 
   const stats: SerializableStats = {
-    totalTransactions: ops.length,
-    uniqueWallets: Array.from(uniqueWallets),
+    totalTransactions: events.length,
+    uniqueWallets: Array.from(walletSet),
     totalXlmLocked: Math.round(totalXlmLocked * 100) / 100,
     totalXlmReleased: Math.round(totalXlmReleased * 100) / 100,
-    recentOperations: ops.slice(0, 20),
-    dailyCounts,
+    recentOperations,
+    dailyCounts: Array.from(dailyMap.entries()).map(([date, count]) => ({
+      date,
+      count,
+    })),
     lastUpdated: Date.now(),
   };
 

@@ -58,14 +58,23 @@ function StatCard({
   return inner;
 }
 
-function ActivityRow({ op }: { op: { id: string; type: string; created_at: string; transaction_hash: string; source_account: string } }) {
+function ActivityRow({ op }: { op: { id: string; type: string; createdAt?: string; created_at?: string; transaction_hash: string; source_account: string } }) {
   const typeLabel: Record<string, { label: string; color: string }> = {
-    invoke_host_function: { label: 'Contract Call', color: 'text-primary-600 bg-primary-50' },
-    payment: { label: 'Payment', color: 'text-success bg-green-50' },
-    create_account: { label: 'Account Created', color: 'text-accent-600 bg-accent-50' },
+    escrow_created:    { label: '🔒 Escrow Created',    color: 'text-primary-600 bg-primary-50' },
+    init_escrow:       { label: '🔒 Escrow Created',    color: 'text-primary-600 bg-primary-50' },
+    escrow_accepted:   { label: '✅ Escrow Accepted',   color: 'text-success bg-green-50' },
+    candidate_accept:  { label: '✅ Escrow Accepted',   color: 'text-success bg-green-50' },
+    milestone_released:{ label: '💸 Milestone Released', color: 'text-emerald-600 bg-emerald-50' },
+    unlock_milestone:  { label: '💸 Milestone Released', color: 'text-emerald-600 bg-emerald-50' },
+    clawback:          { label: '↩️ Clawback',          color: 'text-amber-600 bg-amber-50' },
+    dispute_raised:    { label: '⚠️ Dispute Raised',    color: 'text-fuchsia-600 bg-fuchsia-50' },
+    raise_dispute:     { label: '⚠️ Dispute Raised',    color: 'text-fuchsia-600 bg-fuchsia-50' },
+    dispute_resolved:  { label: '⚖️ Dispute Resolved',  color: 'text-indigo-600 bg-indigo-50' },
+    resolve_dispute:   { label: '⚖️ Dispute Resolved',  color: 'text-indigo-600 bg-indigo-50' },
+    contract_call:     { label: 'Contract Call',         color: 'text-neutral-500 bg-neutral-100' },
   };
   const info = typeLabel[op.type] ?? { label: op.type, color: 'text-neutral-500 bg-neutral-100' };
-  const date = new Date(op.created_at);
+  const date = new Date(op.createdAt ?? op.created_at ?? Date.now());
 
   return (
     <div className="flex items-center gap-3 py-2.5 border-b border-neutral-100 last:border-0">
