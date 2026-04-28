@@ -1,11 +1,7 @@
 # ⭐ Stella ⭐
 
 <div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="frontend/public/S-light.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="frontend/public/S.svg" />
-    <img src="frontend/public/S.svg" alt="Stella Logo" width="120" />
-  </picture>
+  <img src="frontend/public/S.svg" alt="Stella Logo" width="120"/>
   <h1>Stella</h1>
   
   <p><strong>A milestone-based escrow dApp built on Soroban to end the Day Zero poverty trap for fresh graduates.</strong></p>
@@ -20,6 +16,14 @@
     <img src="https://img.shields.io/badge/Soroban-SDK%20v22-blue" alt="Soroban Badge" />
   </p>
 </div>
+
+---
+
+## 1-MIN DEMO VIDEO
+
+<video src="Stella Walkthrough.mp4" controls width="100%"></video>
+
+---
 
 ## What is Stella?
 
@@ -133,11 +137,6 @@ Stella bridges this gap with a programmable escrow where employers lock onboardi
 
 An employer initiates an escrow locking 500 XLM into the Soroban contract. The employer then triggers `unlock_milestone` to securely release exactly 100 XLM for the candidate's first requirement, instantly transferring the funds directly to their wallet. It directly targets a massive, hyper-local friction point in the Philippine job market, perfectly exemplifying Soroban's superiority over unsecured cash advances.
 
-## 1-MIN DEMO VIDEO
-
-<video src="Stella Walkthrough.mp4" controls width="100%"></video>
-
-
 ---
 
 ## 📝 Rise In Submission Details
@@ -200,14 +199,15 @@ To test the complete end-to-end trust flow, we **mandate** using two separate br
 
 ## Tech Stack
 
-| Layer    | Technology                               |
-| -------- | ---------------------------------------- |
-| Contract | Rust, Soroban SDK, soroban-sdk v22       |
-| Frontend | React 19, Vite 6, Tailwind CSS v4        |
-| PWA      | vite-plugin-pwa, Service Workers         |
-| Wallet   | Freighter API v6                         |
-| Network  | Stellar Testnet, Soroban RPC             |
-| Design   | "Warm Fintech Trust" (Google Sans Flex + Inter) |
+| Layer    | Technology                         |
+| -------- | ---------------------------------- |
+| Contract | Rust, Soroban SDK, soroban-sdk v22 |
+| Frontend | React 19, Vite 6, Tailwind CSS v4  |
+| PWA      | vite-plugin-pwa, Service Workers   |
+| Wallet   | Freighter API v6                   |
+| Network  | Stellar Testnet, Soroban RPC       |
+| Design   | "Warm Fintech Trust"               |
+| Fonts    | "Warm Fintech Trust"               |
 
 ## TESTS
 

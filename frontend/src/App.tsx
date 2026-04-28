@@ -6,6 +6,9 @@ import { Onboarding } from './pages/Onboarding';
 import { Employer } from './pages/Employer';
 import { Candidate } from './pages/Candidate';
 import { Arbitrator } from './pages/Arbitrator';
+import AdminLogin from './pages/AdminLogin';
+import Metrics from './pages/Metrics';
+import AdminGuard from './components/AdminGuard';
 
 const App: React.FC = () => {
   return (
@@ -39,6 +42,17 @@ const App: React.FC = () => {
               <Arbitrator />
             </Layout>
           } 
+        />
+
+        {/* Admin routes — standalone layout, no sidebar */}
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route
+          path="/admin/metrics"
+          element={
+            <AdminGuard>
+              <Metrics />
+            </AdminGuard>
+          }
         />
 
         {/* Catch-all: return home */}
