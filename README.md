@@ -24,7 +24,13 @@
 
 ## 1-MIN DEMO VIDEO
 
-<video src="Stella Walkthrough.mp4" controls width="100%"></video>
+<div align="center">
+  <a href="https://youtu.be/-ttPz9u8iZk">
+    <img src="https://img.youtube.com/vi/-ttPz9u8iZk/maxresdefault.jpg" alt="Stella Demo Video" width="720" />
+  </a>
+  <br/>
+  <sub>▶ Click to watch the 1-min walkthrough on YouTube</sub>
+</div>
 
 ---
 
