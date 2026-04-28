@@ -14,6 +14,9 @@
 
   <p>
     <img src="https://img.shields.io/badge/Soroban-SDK%20v22-blue" alt="Soroban Badge" />
+    <img src="https://img.shields.io/badge/Tests-25%20Passing-brightgreen" alt="Tests Badge" />
+    <img src="https://img.shields.io/badge/Level-Black%20Belt%20%E2%AC%9B-black" alt="Level Badge" />
+    <a href="https://github.com/delatorrecj/stellar/actions/workflows/ci.yml"><img src="https://github.com/delatorrecj/stellar/actions/workflows/ci.yml/badge.svg" alt="Stella CI" /></a>
   </p>
 </div>
 
