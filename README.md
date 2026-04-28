@@ -42,6 +42,22 @@ Stella bridges the trust gap between employers and job candidates during onboard
 
 ---
 
+## ⭐️ Project Stella (Bootcamp Pitch)
+
+### The Problem
+
+Fresh graduates in the Philippines looking for BPO jobs accept job offers and then ghost before Day 1 because they lack the ₱3,000–₱5,000 needed for mandatory pre-employment requirements (medical exams, NBI clearance), costing employers thousands in wasted recruitment time and empty seats.
+
+### The Solution
+
+Stella bridges this gap with a programmable escrow where employers lock onboarding funds into a Soroban smart contract, releasing partial payouts precisely as the candidate completes each verified milestone, ensuring zero-trust liquidity for graduates while protecting the employer's capital from advance-theft.
+
+### Core Feature (MVP) & Why It Wins
+
+An employer initiates an escrow locking 500 XLM into the Soroban contract. The employer then triggers `unlock_milestone` to securely release exactly 100 XLM for the candidate's first requirement, instantly transferring the funds directly to their wallet. It directly targets a massive, hyper-local friction point in the Philippine job market, perfectly exemplifying Soroban's superiority over unsecured cash advances.
+
+---
+
 ## Architecture
 
 ### System Design (V2.0 Dispute-Resolution State Machine)
@@ -104,6 +120,9 @@ stella/
 │       └── components/    ActiveEscrowCard, CreateEscrowForm, QuickGuide, etc.
 │
 ├── docs/                  Project documentation
+│   ├── architecture.md           Full architecture reference
+│   ├── security-checklist.md     Security audit & hardening
+│   ├── user-guide.md             End-user guide (Employer / Candidate / Arbitrator)
 │   ├── product_requirements.md   PRD & API signatures
 │   ├── branding.md               Brand guidelines & design tokens
 │   └── context.md                Bootcamp context & session log
@@ -113,6 +132,8 @@ stella/
 │
 └── README.md              ← You are here
 ```
+
+---
 
 ## Smart Contract (V2.0)
 
@@ -128,38 +149,31 @@ stella/
 | `get_escrow`            | Fetches on-chain state & progress             | Public          |
 | `get_candidate_escrows` | Lists employer addresses for a candidate      | Public          |
 
-**Contract ID:** `CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH`
-**Network:** Stellar Testnet (V22)
+**Contract ID:** `CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH`  
+**Network:** Stellar Testnet (V22)  
 **Asset:** Native XLM (`CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`)
-
-## ⭐️ Project Stella (Bootcamp Pitch)
-
-### The Problem
-
-Fresh graduates in the Philippines looking for BPO jobs accept job offers and then ghost before Day 1 because they lack the ₱3,000–₱5,000 needed for mandatory pre-employment requirements (medical exams, NBI clearance), costing employers thousands in wasted recruitment time and empty seats.
-
-### The Solution
-
-Stella bridges this gap with a programmable escrow where employers lock onboarding funds into a Soroban smart contract, releasing partial payouts precisely as the candidate completes each verified milestone, ensuring zero-trust liquidity for graduates while protecting the employer's capital from advance-theft.
-
-### Core Feature (MVP) & Why It Wins
-
-An employer initiates an escrow locking 500 XLM into the Soroban contract. The employer then triggers `unlock_milestone` to securely release exactly 100 XLM for the candidate's first requirement, instantly transferring the funds directly to their wallet. It directly targets a massive, hyper-local friction point in the Philippine job market, perfectly exemplifying Soroban's superiority over unsecured cash advances.
 
 ---
 
-## 📝 Rise In Submission Details
+## Tech Stack
 
-- **GitHub Repository:** [https://github.com/delatorrecj/stellar](https://github.com/delatorrecj/stellar)
-- **Contract ID:** `CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH`
-- **Stellar Expert Link:** [https://stellar.expert/explorer/testnet/contract/CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH](https://stellar.expert/explorer/testnet/contract/CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH)
-- **Short Description:** Stella uses a programmable milestone-based escrow to end the Day Zero poverty trap for fresh graduates. Employers lock pre-employment funds into a smart contract which conditionally releases exact liquidity to candidates as they complete onboarding requirements.
+| Layer    | Technology                         |
+| -------- | ---------------------------------- |
+| Contract | Rust, Soroban SDK, soroban-sdk v22 |
+| Frontend | React 19, Vite 6, Tailwind CSS v4  |
+| PWA      | vite-plugin-pwa, Service Workers   |
+| Wallet   | Freighter API v6                   |
+| Network  | Stellar Testnet, Soroban RPC       |
+| Design   | "Warm Fintech Trust"               |
+| Fonts    | Google Sans Flex, Inter            |
+
+---
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - Rust + `wasm32-unknown-unknown` target
 - Stellar CLI v26+
 - Freighter browser extension
@@ -180,55 +194,76 @@ cargo test
 stellar contract build
 ```
 
-### Walkthrough & Testing Guide:
+---
 
-To test the complete end-to-end trust flow, we **mandate** using two separate browser profiles (or two different browsers like Chrome + Firefox). This allows you to simulate the Employer and Candidate side-by-side without wallet conflicts.
+## Walkthrough & Testing Guide
 
-1.  **Preparation**:
-    - Install **Freighter** on both browser profiles.
-    - Set both to **Stellar Testnet**.
-    - Fund both wallets using the "Fund with Friendbot" button (10,000 test XLM each).
-2.  **Onboarding Guides (New Feature)**:
-    - Whenever you connect a brand new wallet identity to either the Employer or Candidate dashboards for the first time, a **Quick Guide** will automatically pop up.
-    - This is locally tracked: the guide automatically resets and displays itself anytime a _new_ unique ID is detected taking on a role.
-3.  **Employer (Browser A)**:
-    - Connect wallet, review the Quick Guide, and enter the portal.
-    - Copy the **Candidate's address** from Browser B.
-    - Lock funds: Enter the address, add 2-3 milestones (e.g., "Medical Exam" - 50 XLM, "NBI Clearance" - 100 XLM), set a deadline (30 days), and click **Lock Onboarding Funds**.
-4.  **Candidate (Browser B)**:
-    - Connect wallet, review the Quick Guide, and enter the portal.
-    - You will see a "Pending Acceptance" card. Review the milestones and click **Accept Escrow**.
-    - _System Check_: The status in Browser A (Employer) will instantly flip to "Active".
-5.  **Release Funds (Browser A)**:
-    - As the Employer, click **Release** on the first milestone.
-    - _System Check_: The Candidate (Browser B) will see the milestone mark as paid, and their XLM balance (top left) will increase.
-6.  **Conflict Simulation (Disputes)**:
-    - If a deadline expires and funds aren't released, the Candidate (Browser B) can click **Raise Formal Dispute**.
-    - This transitions the escrow to `Disputed`. The platform arbitrator securely handles the contract.
+To test the complete end-to-end trust flow, use two separate browser profiles (or two different browsers like Chrome + Firefox) to simulate the Employer and Candidate side-by-side without wallet conflicts.
 
-## Tech Stack
+1. **Preparation**
+   - Install **Freighter** on both browser profiles.
+   - Set both to **Stellar Testnet**.
+   - Fund both wallets using the "Fund with Friendbot" button (10,000 test XLM each).
+2. **Onboarding Guides**
+   - Whenever you connect a brand new wallet identity for the first time, a **Quick Guide** will automatically pop up.
+3. **Employer (Browser A)**
+   - Connect wallet and enter the portal.
+   - Copy the **Candidate's address** from Browser B.
+   - Lock funds: Enter the address, add 2–3 milestones (e.g., "Medical Exam" – 50 XLM, "NBI Clearance" – 100 XLM), set a deadline (30 days), and click **Lock Onboarding Funds**.
+4. **Candidate (Browser B)**
+   - Connect wallet and enter the portal.
+   - You will see a "Pending Acceptance" card. Review the milestones and click **Accept Escrow**.
+   - _System Check_: The status in Browser A will flip to "Active".
+5. **Release Funds (Browser A)**
+   - As the Employer, click **Release** on the first milestone.
+   - _System Check_: The Candidate's XLM balance will increase instantly.
+6. **Conflict Simulation (Disputes)**
+   - If a deadline expires and funds aren't released, the Candidate can click **Raise Formal Dispute**.
+   - This transitions the escrow to `Disputed`. The platform arbitrator handles the contract.
 
-| Layer    | Technology                         |
-| -------- | ---------------------------------- |
-| Contract | Rust, Soroban SDK, soroban-sdk v22 |
-| Frontend | React 19, Vite 6, Tailwind CSS v4  |
-| PWA      | vite-plugin-pwa, Service Workers   |
-| Wallet   | Freighter API v6                   |
-| Network  | Stellar Testnet, Soroban RPC       |
-| Design   | "Warm Fintech Trust"               |
-| Fonts    | "Warm Fintech Trust"               |
+---
 
-## TESTS
+## Tests (25 Passing)
 
-![test 1](image.png)
-![test 2](image-1.png)
-![test 3](image-2.png)
+<div align="center">
+
+![Test Run 1](image.png)
+![Test Run 2](image-1.png)
+![Test Run 3](image-2.png)
+
+</div>
+
+---
+
+## Mobile View
+
+<div align="center">
+
+![Mobile Screenshot 1](image-3.png)
+![Mobile Screenshot 2](image-4.png)
+![Mobile Screenshot 3](image-5.png)
+
+</div>
+
+---
+
+## 📝 Rise In Submission Details
+
+- **GitHub Repository:** [https://github.com/delatorrecj/stellar](https://github.com/delatorrecj/stellar)
+- **Contract ID:** `CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH`
+- **Stellar Expert Link:** [Contract on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CAZHXCM3UNLT7HJLYHFWBRWAF3PCFN5TR4QCNYDCGCQ6K3ZMU7X7ZSLH)
+- **Live App:** [https://stella-escrow.vercel.app](https://stella-escrow.vercel.app)
+- **Docs:** [Architecture](docs/architecture.md) · [Security Checklist](docs/security-checklist.md) · [User Guide](docs/user-guide.md)
+- **Short Description:** Stella uses a programmable milestone-based escrow to end the Day Zero poverty trap for fresh graduates. Employers lock pre-employment funds into a smart contract which conditionally releases exact liquidity to candidates as they complete onboarding requirements.
+
+---
 
 ## Author
 
-- Carlos Jerico Dela Torre
-- BS Computer Engineering
-- Polytechnic University of the Philippines
+**Carlos Jerico Dela Torre**  
+BS Computer Engineering — Polytechnic University of the Philippines
+
+---
 
 ## License
 
