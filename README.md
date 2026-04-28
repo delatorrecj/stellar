@@ -258,6 +258,64 @@ To test the complete end-to-end trust flow, use two separate browser profiles (o
 
 ---
 
+## 👥 User Onboarding & Feedback
+
+### Google Form (User Registration + Feedback)
+
+> 📋 **[Fill out the Stella User Feedback Form](https://forms.gle/BPs6fbP5yz2NgfA47)**
+>
+> Collects: Name · Email · Wallet Address · Product Rating · Feedback
+
+### User Responses
+
+> 📊 User response data (Excel export) will be linked here once 30+ responses are collected.
+> Responses are exported from the Google Form and verified against the Stellar Testnet Explorer.
+
+### Verified User Wallet Addresses
+
+> The following wallets have interacted with the Stella contract on Stellar Testnet.
+> All addresses are verifiable on [Stellar Expert](https://stellar.expert/explorer/testnet).
+
+<!-- Add wallet addresses here as users onboard, one per line: -->
+<!-- - `G...` -->
+
+---
+
+## 📈 Roadmap — Next Iteration (Based on User Feedback)
+
+The following improvements are planned based on initial user testing and feedback collected via the Google Form:
+
+| Priority | Improvement | Rationale |
+|---|---|---|
+| 🔴 High | **Email notifications** for milestone releases | Users want to be alerted without checking the app |
+| 🔴 High | **Mobile wallet support** (Lobstr, xBull) | Freighter is desktop-only; candidates are on mobile |
+| 🟡 Medium | **Multi-currency escrows** (USDC via SEP-24) | XLM volatility is a concern for fixed-cost milestones |
+| 🟡 Medium | **Arbitrator marketplace** | Allow candidates to choose their arbitrator |
+| 🟢 Low | **Escrow templates** | Pre-built milestone sets for common BPO requirements |
+
+> Improvement commit history: tracked in [CHANGELOG](https://github.com/delatorrecj/stellar/commits/main)
+
+---
+
+## ⚫ Level 6 Black Belt Checklist
+
+| Requirement | Status |
+|---|---|
+| 30+ verified active users | ⏳ Actively onboarding |
+| Metrics dashboard live | ✅ `/admin/metrics` |
+| Security checklist completed | ✅ [security-checklist.md](docs/security-checklist.md) |
+| Monitoring active | ✅ Vercel Analytics + Speed Insights |
+| Data indexing implemented | ✅ Soroban RPC `getEvents` indexer |
+| Full documentation | ✅ Architecture · User Guide · Security |
+| Advanced feature (Fee Sponsorship) | ✅ `lib/sponsor.ts` — FeeBumpTransaction |
+| CI/CD pipeline | ✅ GitHub Actions [badge](https://github.com/delatorrecj/stellar/actions/workflows/ci.yml) |
+| Demo video | ✅ [YouTube](https://youtu.be/-ttPz9u8iZk) |
+| Google Form for user feedback | ✅ [forms.gle/BPs6fbP5yz2NgfA47](https://forms.gle/BPs6fbP5yz2NgfA47) |
+| Community contribution (Twitter post) | ⏳ Pending |
+| 15+ meaningful commits | ✅ 30+ commits |
+
+---
+
 ## Author
 
 **Carlos Jerico Dela Torre**  
